@@ -1,0 +1,98 @@
+import 'package:oscillo_ui/objectbox.g.dart';
+import 'package:oscillo_ui/repo/database/entities/setting_entity.dart';
+import 'package:oscillo_ui/repo/settings/entries/base_entry.dart';
+
+class LocaleEntry extends BaseEntryWithOptions {
+  LocaleEntry._internal() : super(
+    key: 'locale',
+    defaultValue: 'en_GB',
+    title: 'Locale',
+    description: 'Select the locale (language and time format) for the app',
+    options: {
+      'en_GB': 'English (United Kingdom)',
+      'th_TH': 'Thai (Thailand)',
+    },
+  );
+
+  static final LocaleEntry _instance = LocaleEntry._internal();
+
+  factory LocaleEntry() => _instance;
+
+  @override
+  Future<String> get value async {
+    return await txn(TxMode.read, (store, params) {
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      return entity?.value ?? defaultValue;
+    }, null);
+  }
+
+  @override
+  Future<void> setValue(String value) async {
+    await txn(TxMode.write, (store, params) {
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity != null) {
+        entity.value = value;
+        entity.updatedAt = DateTime.now();
+        box.put(entity);
+      } else {
+        box.put(SettingEntity(
+          key: key,
+          value: value,
+          title: title,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
+      }
+    }, null);
+  }
+
+  @override
+  Future<void> reset() async {
+    await txn(TxMode.write, (store, params) {
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity != null) {
+        entity.value = defaultValue;
+        entity.updatedAt = DateTime.now();
+        box.put(entity);
+      } else {
+        box.put(SettingEntity(
+          key: key,
+          value: defaultValue,
+          title: title,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
+      }
+    }, null);
+  }
+
+  @override
+  Future<void> delete() async {
+    await txn(TxMode.write, (store, params) {
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity != null) {
+        box.remove(entity.id);
+      }
+    }, null);
+  }
+}

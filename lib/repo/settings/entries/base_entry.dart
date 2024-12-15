@@ -7,8 +7,6 @@ abstract class BaseEntry {
   final bool defaultEnabled;
   final String title;
   final String? description;
-  final DateTime createdAt;
-  DateTime updatedAt;
 
   final storeRepo = StoreRepo();
   final box = StoreRepo().storeInstance.box<SettingEntity>();
@@ -21,11 +19,9 @@ abstract class BaseEntry {
     this.defaultEnabled = false,
     required this.title,
     this.description,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  Future<bool> get isEnabled async => true;
+  Future<bool> get isEnabled async => defaultEnabled;
 
   Future<String> get value;
 
@@ -37,9 +33,9 @@ abstract class BaseEntry {
 }
 
 mixin Options<T> on BaseEntry {
-  late List<T> _options = [];
+  late Map<T, String> _options = {};
 
-  List<T> get options => _options;
+  Map<T, String> get options => _options;
 }
 
 abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
@@ -49,9 +45,7 @@ abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
     super.defaultEnabled,
     required super.title,
     super.description,
-    required List<String> options,
-    required super.createdAt,
-    required super.updatedAt,
+    required Map<String, String> options,
   }) {
     _options = options;
   }

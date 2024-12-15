@@ -8,9 +8,12 @@ class ThemeEntry extends BaseEntryWithOptions {
           key: 'theme',
           defaultValue: 'light',
           title: 'Theme',
-          options: ['light', 'dark', 'system'],
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          description: 'Select the theme for the app',
+          options: {
+            'light': 'Light',
+            'dark': 'Dark',
+            'system': 'System',
+          },
         );
 
   static final ThemeEntry _instance = ThemeEntry._internal();
