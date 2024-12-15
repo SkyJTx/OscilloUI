@@ -2,18 +2,16 @@ import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class SettingEntity {
-  @Id(assignable: false)
+  @Id()
   late int id;
 
-  @Unique(onConflict: ConflictStrategy.fail)
+  @Unique()
   late String key;
 
   late String value;
 
-  @Unique(onConflict: ConflictStrategy.replace)
+  @Unique()
   late String title;
-
-  late String? description;
 
   late DateTime createdAt;
 
@@ -31,7 +29,6 @@ class SettingEntity {
     required String key,
     required String value,
     required String title,
-    String? description,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) {
@@ -39,7 +36,6 @@ class SettingEntity {
     this.key = key;
     this.value = value;
     this.title = title;
-    this.description = description;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }

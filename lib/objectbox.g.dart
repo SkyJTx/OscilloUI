@@ -45,13 +45,8 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(4, 80711489521961011),
             name: 'title',
             type: 9,
-            flags: 34848,
+            flags: 2080,
             indexId: const obx_int.IdUid(2, 8034370280414256018)),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 7794100521703443392),
-            name: 'description',
-            type: 9,
-            flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(6, 6864368582213039811),
             name: 'createdAt',
@@ -108,7 +103,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [],
+      retiredPropertyUids: const [7794100521703443392],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -127,15 +122,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final keyOffset = fbb.writeString(object.key);
           final valueOffset = fbb.writeString(object.value);
           final titleOffset = fbb.writeString(object.title);
-          final descriptionOffset = object.description == null
-              ? null
-              : fbb.writeString(object.description!);
           fbb.startTable(8);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, keyOffset);
           fbb.addOffset(2, valueOffset);
           fbb.addOffset(3, titleOffset);
-          fbb.addOffset(4, descriptionOffset);
           fbb.addInt64(5, object.createdAt.millisecondsSinceEpoch);
           fbb.addInt64(6, object.updatedAt.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
@@ -152,9 +143,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .vTableGet(buffer, rootOffset, 8, '');
           final titleParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 10, '');
-          final descriptionParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 12);
           final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0));
           final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
@@ -164,7 +152,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
               key: keyParam,
               value: valueParam,
               title: titleParam,
-              description: descriptionParam,
               createdAt: createdAtParam,
               updatedAt: updatedAtParam);
 
@@ -193,15 +180,11 @@ class SettingEntity_ {
   static final title =
       obx.QueryStringProperty<SettingEntity>(_entities[0].properties[3]);
 
-  /// See [SettingEntity.description].
-  static final description =
-      obx.QueryStringProperty<SettingEntity>(_entities[0].properties[4]);
-
   /// See [SettingEntity.createdAt].
   static final createdAt =
-      obx.QueryDateProperty<SettingEntity>(_entities[0].properties[5]);
+      obx.QueryDateProperty<SettingEntity>(_entities[0].properties[4]);
 
   /// See [SettingEntity.updatedAt].
   static final updatedAt =
-      obx.QueryDateProperty<SettingEntity>(_entities[0].properties[6]);
+      obx.QueryDateProperty<SettingEntity>(_entities[0].properties[5]);
 }
