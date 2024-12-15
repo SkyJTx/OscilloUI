@@ -21,6 +21,8 @@ abstract class BaseEntry {
     this.description,
   });
 
+  Future<void> init();
+
   Future<bool> get isEnabled async => defaultEnabled;
 
   Future<String> get value;

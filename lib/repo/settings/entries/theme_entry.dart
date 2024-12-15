@@ -21,6 +21,27 @@ class ThemeEntry extends BaseEntryWithOptions {
   factory ThemeEntry() => _instance;
 
   @override
+  Future<void> init() async {
+    return await txn(TxMode.write, (store, params) {
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity == null) {
+        box.put(SettingEntity(
+          key: key,
+          value: defaultValue,
+          title: title,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
+      }
+    }, null);
+  }
+
+  @override
   Future<String> get value async {
     return await txn(TxMode.read, (store, params) {
       final entity = box
