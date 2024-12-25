@@ -3,16 +3,17 @@ import 'package:oscillo_ui/repo/database/entities/setting_entity.dart';
 import 'package:oscillo_ui/repo/settings/entries/base_entry.dart';
 
 class LocaleEntry extends BaseEntryWithOptions {
-  LocaleEntry._internal() : super(
-    key: 'locale',
-    defaultValue: 'en_GB',
-    title: 'Locale',
-    description: 'Select the locale (language and time format) for the app',
-    options: {
-      'en_GB': 'English (United Kingdom)',
-      'th_TH': 'Thai (Thailand)',
-    },
-  );
+  LocaleEntry._internal()
+      : super(
+          key: 'locale',
+          defaultValue: 'en',
+          title: 'Locale',
+          description: 'Select the locale (language and time format) for the app',
+          options: {
+            'en': 'English (International)',
+            'th': 'Thai (Thailand)',
+          },
+        );
 
   static final LocaleEntry _instance = LocaleEntry._internal();
 
@@ -20,7 +21,12 @@ class LocaleEntry extends BaseEntryWithOptions {
 
   @override
   Future<void> init() async {
-    return await txn(TxMode.write, (store, params) {
+    return await txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      final defaultValue = p.defaultValue;
+      final title = p.title;
+
       final entity = box
           .query(SettingEntity_.key.equals(
             key,
@@ -36,12 +42,16 @@ class LocaleEntry extends BaseEntryWithOptions {
           updatedAt: DateTime.now(),
         ));
       }
-    }, null);
+    }, params);
   }
 
   @override
   Future<String> get value async {
-    return await txn(TxMode.read, (store, params) {
+    return await txn(TxMode.read, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      final defaultValue = p.defaultValue;
+
       final entity = box
           .query(SettingEntity_.key.equals(
             key,
@@ -49,12 +59,18 @@ class LocaleEntry extends BaseEntryWithOptions {
           .build()
           .findFirst();
       return entity?.value ?? defaultValue;
-    }, null);
+    }, params);
   }
 
   @override
   Future<void> setValue(String value) async {
+    if (!options.containsKey(value)) throw Exception('Invalid value');
+
     await txn(TxMode.write, (store, params) {
+      final box = params.box;
+      final key = params.key;
+      final title = params.title;
+
       final entity = box
           .query(SettingEntity_.key.equals(
             key,
@@ -74,12 +90,17 @@ class LocaleEntry extends BaseEntryWithOptions {
           updatedAt: DateTime.now(),
         ));
       }
-    }, null);
+    }, params);
   }
 
   @override
   Future<void> reset() async {
-    await txn(TxMode.write, (store, params) {
+    await txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      final defaultValue = p.defaultValue;
+      final title = p.title;
+      
       final entity = box
           .query(SettingEntity_.key.equals(
             key,
@@ -99,12 +120,15 @@ class LocaleEntry extends BaseEntryWithOptions {
           updatedAt: DateTime.now(),
         ));
       }
-    }, null);
+    }, params);
   }
 
   @override
   Future<void> delete() async {
-    await txn(TxMode.write, (store, params) {
+    await txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      
       final entity = box
           .query(SettingEntity_.key.equals(
             key,
@@ -114,6 +138,6 @@ class LocaleEntry extends BaseEntryWithOptions {
       if (entity != null) {
         box.remove(entity.id);
       }
-    }, null);
+    }, params);
   }
 }

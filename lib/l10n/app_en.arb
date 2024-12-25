@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+  "@@author": "SkyJT",
+  "title": "OscilloUI",
+  "@title": {
+    "description": "The title of the app",
+    "type": "text"
+  },
+  "description": "App for controlling RIGOL DS1054Z",
+  "@description": {
+    "description": "The description of the app",
+    "type": "text"
+  },
+  "test": "ทดสอบ",
+  "@test": {
+    "description": "This is a test string",
+    "type": "text"
+  }
+}

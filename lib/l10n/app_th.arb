@@ -1,0 +1,19 @@
+{
+  "@@locale": "th",
+  "@@author": "SkyJT",
+  "title": "OscilloUI",
+  "@title": {
+    "description": "ชื่อแอป",
+    "type": "text"
+  },
+  "description": "แอปสำหรับควบคุม RIGOL DS1054Z",
+  "@description": {
+    "description": "คำอธิบายของแอป",
+    "type": "text"
+  },
+  "test": "ทดสอบ",
+  "@test": {
+    "description": "นี่คือข้อความทดสอบ",
+    "type": "text"
+  }
+}

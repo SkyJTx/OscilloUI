@@ -45,10 +45,51 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:2963078795223505220",
+      "lastPropertyId": "6:8223127760031403606",
+      "name": "ConnectionSetEntity",
+      "properties": [
+        {
+          "id": "1:5939702410365521608",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4536292270156213507",
+          "name": "name",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "3:7085086959766925968"
+        },
+        {
+          "id": "3:2883265594131988820",
+          "name": "host",
+          "type": 9
+        },
+        {
+          "id": "4:2423556378500653587",
+          "name": "port",
+          "type": 6
+        },
+        {
+          "id": "5:7265141699370588719",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "6:8223127760031403606",
+          "name": "updatedAt",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:84610850157116005",
-  "lastIndexId": "2:8034370280414256018",
+  "lastEntityId": "2:2963078795223505220",
+  "lastIndexId": "3:7085086959766925968",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

@@ -1,6 +1,6 @@
 name: oscillo_ui
 description: "An app for controlling oscilloscope especially RIGOL DS1054Z"
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -8,11 +8,16 @@ environment:
 
 dependencies:
   connectivity_plus: ^6.1.1
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_animate: ^4.5.2
   flutter_bloc: ^8.1.6
+  flutter_localizations:
+    sdk: flutter
+  get_it: ^8.0.3
   google_fonts: ^6.2.1
-  intl: ^0.20.1
+  intl: any
   objectbox: ^4.0.3
   objectbox_flutter_libs: any
   path_provider: ^2.1.5
@@ -26,3 +31,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true

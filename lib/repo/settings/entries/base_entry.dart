@@ -1,3 +1,4 @@
+import 'package:oscillo_ui/objectbox.g.dart';
 import 'package:oscillo_ui/repo/database/database_repo.dart';
 import 'package:oscillo_ui/repo/database/entities/setting_entity.dart';
 
@@ -20,6 +21,24 @@ abstract class BaseEntry {
     required this.title,
     this.description,
   });
+
+  ({
+    String key,
+    String defaultValue,
+    bool defaultEnabled,
+    String title,
+    String? description,
+    Box<SettingEntity> box,
+    Map<String, String>? options,
+  }) get params => (
+        key: key,
+        defaultValue: defaultValue,
+        defaultEnabled: defaultEnabled,
+        title: title,
+        description: description,
+        box: box,
+        options: null,
+      );
 
   Future<void> init();
 
@@ -51,4 +70,23 @@ abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
   }) {
     _options = options;
   }
+
+  @override
+  ({
+    String key,
+    String defaultValue,
+    bool defaultEnabled,
+    String title,
+    String? description,
+    Box<SettingEntity> box,
+    Map<String, String> options,
+  }) get params => (
+        key: key,
+        defaultValue: defaultValue,
+        defaultEnabled: defaultEnabled,
+        title: title,
+        description: description,
+        box: box,
+        options: options,
+      );
 }

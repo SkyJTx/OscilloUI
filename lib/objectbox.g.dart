@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'repo/database/entities/connection_set_entity.dart';
 import 'repo/database/entities/setting_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -59,6 +60,46 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(2, 2963078795223505220),
+      name: 'ConnectionSetEntity',
+      lastPropertyId: const obx_int.IdUid(6, 8223127760031403606),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 5939702410365521608),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 4536292270156213507),
+            name: 'name',
+            type: 9,
+            flags: 2080,
+            indexId: const obx_int.IdUid(3, 7085086959766925968)),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 2883265594131988820),
+            name: 'host',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 2423556378500653587),
+            name: 'port',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 7265141699370588719),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 8223127760031403606),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -97,8 +138,8 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(1, 84610850157116005),
-      lastIndexId: const obx_int.IdUid(2, 8034370280414256018),
+      lastEntityId: const obx_int.IdUid(2, 2963078795223505220),
+      lastIndexId: const obx_int.IdUid(3, 7085086959766925968),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
@@ -156,6 +197,52 @@ obx_int.ModelDefinition getObjectBoxModel() {
               updatedAt: updatedAtParam);
 
           return object;
+        }),
+    ConnectionSetEntity: obx_int.EntityDefinition<ConnectionSetEntity>(
+        model: _entities[1],
+        toOneRelations: (ConnectionSetEntity object) => [],
+        toManyRelations: (ConnectionSetEntity object) => {},
+        getId: (ConnectionSetEntity object) => object.id,
+        setId: (ConnectionSetEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (ConnectionSetEntity object, fb.Builder fbb) {
+          final nameOffset = fbb.writeString(object.name);
+          final hostOffset = fbb.writeString(object.host);
+          fbb.startTable(7);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, nameOffset);
+          fbb.addOffset(2, hostOffset);
+          fbb.addInt64(3, object.port);
+          fbb.addInt64(4, object.createdAt.millisecondsSinceEpoch);
+          fbb.addInt64(5, object.updatedAt.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final nameParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 6, '');
+          final hostParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 8, '');
+          final portParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0));
+          final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0));
+          final object = ConnectionSetEntity(
+              id: idParam,
+              name: nameParam,
+              host: hostParam,
+              port: portParam,
+              createdAt: createdAtParam,
+              updatedAt: updatedAtParam);
+
+          return object;
         })
   };
 
@@ -187,4 +274,31 @@ class SettingEntity_ {
   /// See [SettingEntity.updatedAt].
   static final updatedAt =
       obx.QueryDateProperty<SettingEntity>(_entities[0].properties[5]);
+}
+
+/// [ConnectionSetEntity] entity fields to define ObjectBox queries.
+class ConnectionSetEntity_ {
+  /// See [ConnectionSetEntity.id].
+  static final id =
+      obx.QueryIntegerProperty<ConnectionSetEntity>(_entities[1].properties[0]);
+
+  /// See [ConnectionSetEntity.name].
+  static final name =
+      obx.QueryStringProperty<ConnectionSetEntity>(_entities[1].properties[1]);
+
+  /// See [ConnectionSetEntity.host].
+  static final host =
+      obx.QueryStringProperty<ConnectionSetEntity>(_entities[1].properties[2]);
+
+  /// See [ConnectionSetEntity.port].
+  static final port =
+      obx.QueryIntegerProperty<ConnectionSetEntity>(_entities[1].properties[3]);
+
+  /// See [ConnectionSetEntity.createdAt].
+  static final createdAt =
+      obx.QueryDateProperty<ConnectionSetEntity>(_entities[1].properties[4]);
+
+  /// See [ConnectionSetEntity.updatedAt].
+  static final updatedAt =
+      obx.QueryDateProperty<ConnectionSetEntity>(_entities[1].properties[5]);
 }
