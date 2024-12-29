@@ -1,11 +1,21 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:gal/gal.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_api_provider.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_video_command.dart';
+import 'package:oscillo_ui/repo/settings/settings_repo.dart';
+
+typedef ImageByteWithTimestamp = ({
+  DateTime timestamp,
+  Uint8List image,
+});
 
 class OscilloscopeRepo {
+  static final String _imageAlbum = 'Oscilloscope';
+
   static final OscilloscopeRepo _instance = OscilloscopeRepo._internal();
 
   factory OscilloscopeRepo() => _instance;
@@ -14,7 +24,7 @@ class OscilloscopeRepo {
 
   OscilloscopeApiProvider? _apiProvider;
 
-  StreamController<Uint8List>? _videoStreamController;
+  StreamController<ImageByteWithTimestamp>? _videoStreamController;
 
   Isolate? _videoIsolate;
 
@@ -29,7 +39,7 @@ class OscilloscopeRepo {
     return _apiProvider!;
   }
 
-  StreamController<Uint8List> get videoStreamController {
+  StreamController<ImageByteWithTimestamp> get videoStreamController {
     if (_videoStreamController == null) {
       throw Exception('Video Stream is not initialized');
     }
@@ -69,14 +79,14 @@ class OscilloscopeRepo {
     );
     await apiProvider.connect();
 
-    _videoStreamController = StreamController<Uint8List>.broadcast();
+    _videoStreamController = StreamController<ImageByteWithTimestamp>.broadcast();
 
     _receivePort = ReceivePort();
     receivePort.listen((message) {
       if (message is SendPort) {
         _sendPort = message;
         sendPort.send(apiProvider);
-      } else if (message is Uint8List) {
+      } else if (message is ImageByteWithTimestamp) {
         videoStreamController.add(message);
       }
     });
@@ -91,6 +101,7 @@ class OscilloscopeRepo {
   Future<void> _videoIsolateEntryPoint(SendPort port) async {
     late final OscilloscopeApiProvider apiProvider;
     bool isCapturing = false;
+    bool isStopped = false;
 
     final receivePort = ReceivePort();
     port.send(receivePort.sendPort);
@@ -106,16 +117,24 @@ class OscilloscopeRepo {
     receivePort.listen((msg) async {
       if (msg is OscilloscopeVideoCommandStart || msg is OscilloscopeVideoCommandResume) {
         isCapturing = true;
-      } else if (msg is OscilloscopeVideoCommandPause || msg is OscilloscopeVideoCommandStop) {
+      } else if (msg is OscilloscopeVideoCommandPause) {
         isCapturing = false;
+      } else if (msg is OscilloscopeVideoCommandStop) {
+        isCapturing = false;
+        isStopped = true;
       }
     });
 
-    while (true) {
+    while (!isStopped) {
       if (!isCapturing) continue;
       final data = await apiProvider.capture();
-      port.send(data);
+      port.send((
+        timestamp: DateTime.now(),
+        image: data,
+      ));
     }
+
+    receivePort.close();
   }
 
   void sendVideoCommand(OscilloscopeVideoCommand command) {
@@ -123,9 +142,10 @@ class OscilloscopeRepo {
   }
 
   Future<void> disconnect() async {
+    sendPort.send(OscilloscopeVideoCommandStop());
     videoIsolate.kill(priority: Isolate.immediate);
     receivePort.close();
-    videoStreamController.close();
+    await videoStreamController.close();
     await apiProvider.disconnect();
 
     _apiProvider = null;
@@ -133,5 +153,33 @@ class OscilloscopeRepo {
     _videoIsolate = null;
     _receivePort = null;
     _sendPort = null;
+  }
+
+  Future<Uint8List> saveCapture() async {
+    final image = await apiProvider.capture();
+    final pathRepo = SettingsRepo().imageSavePath;
+    if (image.isEmpty) {
+      throw Exception('Failed to capture image');
+    }
+
+    if (await pathRepo.isEnabled) {
+      final folderPath = await pathRepo.value;
+      final path = '$folderPath/capture_${DateTime.now().toIso8601String()}.png';
+      final file = File(path);
+      await file.writeAsBytes(image);
+    } else if (Platform.isAndroid || Platform.isIOS) {
+      if (!await Gal.requestAccess(toAlbum: true)) {
+        throw Exception('Permission denied');
+      }
+      await Gal.putImageBytes(
+        image,
+        name: 'capture_${DateTime.now().toIso8601String()}.png',
+        album: _imageAlbum,
+      );
+    } else {
+      throw Exception('Saving image is not supported on this platform');
+    }
+
+    return image;
   }
 }

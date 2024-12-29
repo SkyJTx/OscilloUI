@@ -28,5 +28,10 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We would like access to your photo gallery for saving oscilloscope captured images and videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We would like access to your photo gallery for saving oscilloscope captured images and videos.</string>
 </dict>
 </plist>

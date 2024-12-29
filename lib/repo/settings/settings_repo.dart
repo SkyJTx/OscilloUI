@@ -1,9 +1,11 @@
 import 'package:oscillo_ui/repo/database/database_repo.dart';
 import 'package:oscillo_ui/repo/settings/entries/base_entry.dart';
 import 'package:oscillo_ui/repo/settings/entries/host_entry.dart';
+import 'package:oscillo_ui/repo/settings/entries/image_save_path.dart';
 import 'package:oscillo_ui/repo/settings/entries/locale_entry.dart';
 import 'package:oscillo_ui/repo/settings/entries/port_entry.dart';
 import 'package:oscillo_ui/repo/settings/entries/theme_entry.dart';
+import 'package:oscillo_ui/repo/settings/entries/video_save_path.dart';
 
 class SettingsRepo {
   static final storeRepo = StoreRepo();
@@ -27,10 +29,16 @@ class SettingsRepo {
 
   PortEntry get port => PortEntry();
 
+  ImageSavePath get imageSavePath => ImageSavePath();
+
+  VideoSavePath get videoSavePath => VideoSavePath();
+
   List<BaseEntry> get entries => [
         ThemeEntry(),
         LocaleEntry(),
         HostEntry(),
         PortEntry(),
+        ImageSavePath(),
+        VideoSavePath(),
       ];
 }

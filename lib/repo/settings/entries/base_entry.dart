@@ -40,17 +40,111 @@ abstract class BaseEntry {
         options: null,
       );
 
-  Future<void> init();
+  Future<void> init() async {
+    return txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      final defaultValue = p.defaultValue;
+      final title = p.title;
+
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity == null) {
+        box.put(SettingEntity(
+          key: key,
+          value: defaultValue,
+          title: title,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
+      }
+    }, params);
+  }
 
   Future<bool> get isEnabled async => defaultEnabled;
 
-  Future<String> get value;
+  Future<String> get value {
+    return txn(TxMode.read, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      final defaultValue = p.defaultValue;
 
-  Future<void> setValue(String value);
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      return entity?.value ?? defaultValue;
+    }, params);
+  }
 
-  Future<void> reset();
+  Future<void> setValue(String value) {
+    return txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
 
-  Future<void> delete();
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity != null) {
+        entity.value = value;
+        entity.updatedAt = DateTime.now();
+        box.put(entity);
+      }
+    }, params);
+  }
+
+  Future<void> reset() {
+    return txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity != null) {
+        entity.value = defaultValue;
+        entity.updatedAt = DateTime.now();
+        box.put(entity);
+      } else {
+        box.put(SettingEntity(
+          key: key,
+          value: defaultValue,
+          title: title,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
+      }
+    }, params);
+  }
+
+  Future<void> delete() {
+    return txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity != null) {
+        box.remove(entity.id);
+      }
+    }, params);
+  }
 }
 
 mixin Options<T> on BaseEntry {
@@ -89,4 +183,44 @@ abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
         box: box,
         options: options,
       );
+  
+  @override
+  Future<void> init() async {
+    return txn(TxMode.write, (store, p) {
+      final box = p.box;
+      final key = p.key;
+      final defaultValue = p.defaultValue;
+      final title = p.title;
+      final options = p.options;
+
+      final entity = box
+          .query(SettingEntity_.key.equals(
+            key,
+          ))
+          .build()
+          .findFirst();
+      if (entity == null) {
+        box.put(SettingEntity(
+          key: key,
+          value: defaultValue,
+          title: title,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
+      } else {
+        if (!options.containsKey(entity.value)) {
+          entity.value = defaultValue;
+          entity.updatedAt = DateTime.now();
+          box.put(entity);
+        }
+      }
+    }, params);
+  }
+
+  @override
+  Future<void> setValue(String value) {
+    if (!options.containsKey(value)) throw Exception('Invalid value');
+
+    return super.setValue(value);
+  }
 }
