@@ -67,7 +67,9 @@ class OscilloscopeRepo {
     return _sendPort!;
   }
 
-  bool get isConnected => apiProvider.isConnected;
+  bool _isConnected = false;
+
+  bool get isConnected => _isConnected;
 
   Future<void> connect(
     String host,
@@ -96,6 +98,8 @@ class OscilloscopeRepo {
       receivePort.sendPort,
       debugName: 'OscilloscopeVideoIsolate',
     );
+
+    _isConnected = true;
   }
 
   Future<void> _videoIsolateEntryPoint(SendPort port) async {
@@ -159,6 +163,8 @@ class OscilloscopeRepo {
     _videoIsolate = null;
     _receivePort = null;
     _sendPort = null;
+
+    _isConnected = false;
   }
 
   Future<Uint8List> saveCapture() async {
