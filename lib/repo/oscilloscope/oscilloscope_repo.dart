@@ -123,6 +123,8 @@ class OscilloscopeRepo {
         isCapturing = false;
         isStopped = true;
       }
+
+      port.send(msg);
     });
 
     while (!isStopped) {
@@ -137,8 +139,12 @@ class OscilloscopeRepo {
     receivePort.close();
   }
 
-  void sendVideoCommand(OscilloscopeVideoCommand command) {
+  Future<void> sendVideoCommand(OscilloscopeVideoCommand command) async {
     sendPort.send(command);
+    final msg = await receivePort.first;
+    if (msg.runtimeType != command.runtimeType) {
+      throw Exception('Invalid response');
+    }
   }
 
   Future<void> disconnect() async {
@@ -156,30 +162,38 @@ class OscilloscopeRepo {
   }
 
   Future<Uint8List> saveCapture() async {
-    final image = await apiProvider.capture();
-    final pathRepo = SettingsRepo().imageSavePath;
-    if (image.isEmpty) {
-      throw Exception('Failed to capture image');
-    }
+    try {
+      sendVideoCommand(OscilloscopeVideoCommandPause());
 
-    if (await pathRepo.isEnabled) {
-      final folderPath = await pathRepo.value;
-      final path = '$folderPath/capture_${DateTime.now().toIso8601String()}.png';
-      final file = File(path);
-      await file.writeAsBytes(image);
-    } else if (Platform.isAndroid || Platform.isIOS) {
-      if (!await Gal.requestAccess(toAlbum: true)) {
-        throw Exception('Permission denied');
+      final image = await apiProvider.capture();
+      final pathRepo = SettingsRepo().imageSavePath;
+      if (image.isEmpty) {
+        throw Exception('Failed to capture image');
       }
-      await Gal.putImageBytes(
-        image,
-        name: 'capture_${DateTime.now().toIso8601String()}.png',
-        album: _imageAlbum,
-      );
-    } else {
-      throw Exception('Saving image is not supported on this platform');
-    }
 
-    return image;
+      if (await pathRepo.isEnabled) {
+        final folderPath = await pathRepo.value;
+        final path = '$folderPath/capture_${DateTime.now().toIso8601String()}.png';
+        final file = File(path);
+        await file.writeAsBytes(image);
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        if (!await Gal.requestAccess(toAlbum: true)) {
+          throw Exception('Permission denied');
+        }
+        await Gal.putImageBytes(
+          image,
+          name: 'capture_${DateTime.now().toIso8601String()}.png',
+          album: _imageAlbum,
+        );
+      } else {
+        throw Exception('Saving image is not supported on this platform');
+      }
+
+      return image;
+    } catch (e) {
+      rethrow;
+    } finally {
+      sendVideoCommand(OscilloscopeVideoCommandResume());
+    }
   }
 }
