@@ -13,7 +13,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThemeBuilder(
-      builder: (context, lightTheme, darkTheme, themeMode) {
+      builder: (
+        context,
+        currentTheme,
+        lightTheme,
+        darkTheme,
+        themeMode,
+      ) {
         return MaterialApp(
           onGenerateTitle: (context) {
             final title = AppLocalizations.of(context)!.title;

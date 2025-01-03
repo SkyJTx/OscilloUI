@@ -7,6 +7,7 @@ import 'package:oscillo_ui/constant/theme.dart';
 class ThemeBuilder extends StatelessWidget {
   final Widget Function(
     BuildContext context,
+    ThemeData currentTheme,
     ThemeData lightTheme,
     ThemeData darkTheme,
     ThemeMode themeMode,
@@ -25,6 +26,7 @@ class ThemeBuilder extends StatelessWidget {
         builder: (context, state) {
           return builder(
             context,
+            state.themeData(),
             lightTheme,
             darkTheme,
             state.themeMode(),

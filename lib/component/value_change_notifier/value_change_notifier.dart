@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,9 +7,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ValueChangeNotifer<T extends Object?> extends Cubit<T> {
   ValueChangeNotifer(super.state);
 
+  final List<FutureOr<void> Function(T value)> _listeners = [];
+
   T get value => state;
 
-  set value(T value) => emit(value);
+  set value(T value) {
+    emit(value);
+    for (final listener in _listeners) {
+      listener(value);
+    }
+  }
+
+  void addListener(FutureOr<void> Function(T value) listener) {
+    _listeners.add(listener);
+  }
+
+  void removeListener(FutureOr<void> Function(T value) listener) {
+    _listeners.remove(listener);
+  }
 }
 
 class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
