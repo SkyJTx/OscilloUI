@@ -18,25 +18,28 @@ class ConnectionsRepo {
   Future<void> fetch() async {
     return await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.read,
-      (store, p) {
+      (store, connections) {
         final box = store.box<ConnectionSetEntity>();
         final connectionsSet = box.getAll();
-        _connections.clear();
-        _connections.addAll(connectionsSet);
+        connections.clear();
+        connections.addAll(connectionsSet);
       },
-      null,
+      _connections,
     );
   }
 
   Future<void> add(ConnectionSetEntity connection) async {
     return await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, p) {
+      (store, params) {
         final box = store.box<ConnectionSetEntity>();
-        box.put(connection);
-        _connections.add(connection);
+        box.put(params.connection);
+        params.connections.add(params.connection);
       },
-      null,
+      (
+        connections: _connections,
+        connection: connection,
+      ),
     );
   }
 
@@ -48,45 +51,54 @@ class ConnectionsRepo {
   }) async {
     return await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, p) {
+      (store, params) {
         final box = store.box<ConnectionSetEntity>();
-        final index = _connections.indexWhere((element) => element.id == connection.id);
+        final index = params.connections.indexWhere(
+          (element) => element.id == params.connection.id,
+        );
         if (index != -1) {
-          connection.name = name ?? connection.name;
-          connection.host = host ?? connection.host;
-          connection.port = port ?? connection.port;
-          box.put(connection);
-          _connections[index] = connection;
+          params.connection.name = name ?? connection.name;
+          params.connection.host = host ?? connection.host;
+          params.connection.port = port ?? connection.port;
+          box.put(params.connection);
+          params.connections[index] = params.connection;
         }
       },
-      null,
+      (
+        connections: _connections,
+        connection: connection,
+      ),
     );
   }
 
   Future<void> remove(ConnectionSetEntity connection) async {
     return await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, p) {
+      (store, params) {
         final box = store.box<ConnectionSetEntity>();
-        final index = _connections.indexWhere((element) => element.id == connection.id);
+        final index =
+            params.connections.indexWhere((element) => element.id == params.connection.id);
         if (index != -1) {
-          box.remove(connection.id);
-          _connections.removeAt(index);
+          box.remove(params.connection.id);
+          params.connections.removeAt(index);
         }
       },
-      null,
+      (
+        connections: _connections,
+        connection: connection,
+      ),
     );
   }
 
   Future<void> clear() async {
     return await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, p) {
+      (store, params) {
         final box = store.box<ConnectionSetEntity>();
         box.removeAll();
-        _connections.clear();
+        params.connections.clear();
       },
-      null,
+      (connections: _connections,),
     );
   }
 }
