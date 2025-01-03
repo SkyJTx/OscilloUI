@@ -15,7 +15,7 @@ class ConnectionsRepo {
 
   ConnectionsRepo._internal();
 
-  Future<void> fetch() async {
+  Future<List<ConnectionSetEntity>> fetch() async {
     return await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.read,
       (store, connections) {
@@ -23,33 +23,42 @@ class ConnectionsRepo {
         final connectionsSet = box.getAll();
         connections.clear();
         connections.addAll(connectionsSet);
+
+        return connections;
       },
       _connections,
     );
   }
 
-  Future<void> add(ConnectionSetEntity connection) async {
-    return await storeRepo.storeInstance.runInTransactionAsync(
+  Future<List<ConnectionSetEntity>> add(ConnectionSetEntity connection) async {
+    final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
       (store, params) {
         final box = store.box<ConnectionSetEntity>();
         box.put(params.connection);
         params.connections.add(params.connection);
+
+        return params.connections;
       },
       (
         connections: _connections,
         connection: connection,
       ),
     );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
   }
 
-  Future<void> update(
+  Future<List<ConnectionSetEntity>> update(
     ConnectionSetEntity connection, {
     String? name,
     String? host,
     int? port,
   }) async {
-    return await storeRepo.storeInstance.runInTransactionAsync(
+    final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
       (store, params) {
         final box = store.box<ConnectionSetEntity>();
@@ -63,16 +72,23 @@ class ConnectionsRepo {
           box.put(params.connection);
           params.connections[index] = params.connection;
         }
+
+        return params.connections;
       },
       (
         connections: _connections,
         connection: connection,
       ),
     );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
   }
 
-  Future<void> remove(ConnectionSetEntity connection) async {
-    return await storeRepo.storeInstance.runInTransactionAsync(
+  Future<List<ConnectionSetEntity>> remove(ConnectionSetEntity connection) async {
+    final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
       (store, params) {
         final box = store.box<ConnectionSetEntity>();
@@ -82,23 +98,37 @@ class ConnectionsRepo {
           box.remove(params.connection.id);
           params.connections.removeAt(index);
         }
+
+        return params.connections;
       },
       (
         connections: _connections,
         connection: connection,
       ),
     );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
   }
 
-  Future<void> clear() async {
-    return await storeRepo.storeInstance.runInTransactionAsync(
+  Future<List<ConnectionSetEntity>> clear() async {
+    final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
       (store, params) {
         final box = store.box<ConnectionSetEntity>();
         box.removeAll();
         params.connections.clear();
+
+        return params.connections;
       },
-      (connections: _connections,),
+      (connections: _connections),
     );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
   }
 }
