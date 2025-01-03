@@ -55,26 +55,3 @@ class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
     );
   }
 }
-
-void t() {
-  final widget = ValueChangeNotifierBuilder.easy<int>(
-    initialValue: 0,
-    builder: (context, value, setValue) {
-      return Container(
-        margin: EdgeInsets.all(16),
-        child: Column(
-          spacing: 8,
-          children: [
-            Text('Value: $value'),
-            ElevatedButton(
-              onPressed: () {
-                setValue(value + 1);
-              },
-              child: Text('Increment'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
