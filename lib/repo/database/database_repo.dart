@@ -19,7 +19,7 @@ class StoreRepo {
 
   factory StoreRepo() => _instance;
 
-  static Future<StoreRepo> create() async {
+  static Future<StoreRepo> create() async {    
     if (_store != null) {
       return _instance;
     }

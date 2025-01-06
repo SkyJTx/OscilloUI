@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:oscillo_ui/objectbox.g.dart';
 import 'package:oscillo_ui/repo/database/database_repo.dart';
 import 'package:oscillo_ui/repo/database/entities/setting_entity.dart';
@@ -12,7 +14,18 @@ abstract class BaseEntry {
   final storeRepo = StoreRepo();
   final box = StoreRepo().storeInstance.box<SettingEntity>();
   final run = StoreRepo().storeInstance.runAsync;
-  final txn = StoreRepo().storeInstance.runInTransactionAsync;
+  FutureOr<Result> txn<Result, Param>(
+    TxMode mode,
+    Result Function(Store, Param) callback,
+    Param param,
+  ) async {
+    return StoreRepo().storeInstance.runInTransaction<Result>(
+      mode,
+      () {
+        return callback(StoreRepo.store, param);
+      },
+    );
+  }
 
   BaseEntry({
     required this.key,
@@ -22,30 +35,22 @@ abstract class BaseEntry {
     this.description,
   });
 
-  ({
-    String key,
-    String defaultValue,
-    bool defaultEnabled,
-    String title,
-    String? description,
-    Box<SettingEntity> box,
-    Map<String, String>? options,
-  }) get params => (
-        key: key,
-        defaultValue: defaultValue,
-        defaultEnabled: defaultEnabled,
-        title: title,
-        description: description,
-        box: box,
-        options: null,
-      );
+  Map<String, Object?> get params => {
+        'key': key,
+        'defaultValue': defaultValue,
+        'defaultEnabled': defaultEnabled,
+        'title': title,
+        'description': description,
+        'box': box,
+        'options': null,
+      };
 
   Future<void> init() async {
     return txn(TxMode.write, (store, p) {
-      final box = p.box;
-      final key = p.key;
-      final defaultValue = p.defaultValue;
-      final title = p.title;
+      final box = p['box'] as Box<SettingEntity>;
+      final key = p['key'] as String;
+      final defaultValue = p['defaultValue'] as String;
+      final title = p['title'] as String;
 
       final entity = box
           .query(SettingEntity_.key.equals(
@@ -68,10 +73,10 @@ abstract class BaseEntry {
   Future<bool> get isEnabled async => defaultEnabled;
 
   Future<String> get value {
-    return txn(TxMode.read, (store, p) {
-      final box = p.box;
-      final key = p.key;
-      final defaultValue = p.defaultValue;
+    final r = txn(TxMode.read, (store, p) {
+      final box = p['box'] as Box<SettingEntity>;
+      final key = p['key'] as String;
+      final defaultValue = p['defaultValue'] as String;
 
       final entity = box
           .query(SettingEntity_.key.equals(
@@ -81,12 +86,14 @@ abstract class BaseEntry {
           .findFirst();
       return entity?.value ?? defaultValue;
     }, params);
+
+    return Future.value(r);
   }
 
   Future<void> setValue(String value) {
-    return txn(TxMode.write, (store, p) {
-      final box = p.box;
-      final key = p.key;
+    final r =  txn(TxMode.write, (store, p) {
+      final box = p['box'] as Box<SettingEntity>;
+      final key = p['key'] as String;
 
       final entity = box
           .query(SettingEntity_.key.equals(
@@ -100,12 +107,16 @@ abstract class BaseEntry {
         box.put(entity);
       }
     }, params);
+
+    return Future.value(r);
   }
 
   Future<void> reset() {
-    return txn(TxMode.write, (store, p) {
-      final box = p.box;
-      final key = p.key;
+    final r = txn(TxMode.write, (store, p) {
+      final box = p['box'] as Box<SettingEntity>;
+      final key = p['key'] as String;
+      final defaultValue = p['defaultValue'] as String;
+      final title = p['title'] as String;
 
       final entity = box
           .query(SettingEntity_.key.equals(
@@ -127,12 +138,14 @@ abstract class BaseEntry {
         ));
       }
     }, params);
+
+    return Future.value(r);
   }
 
   Future<void> delete() {
-    return txn(TxMode.write, (store, p) {
-      final box = p.box;
-      final key = p.key;
+    final r = txn(TxMode.write, (store, p) {
+      final box = p['box'] as Box<SettingEntity>;
+      final key = p['key'] as String;
 
       final entity = box
           .query(SettingEntity_.key.equals(
@@ -144,6 +157,8 @@ abstract class BaseEntry {
         box.remove(entity.id);
       }
     }, params);
+
+    return Future.value(r);
   }
 }
 
@@ -166,32 +181,16 @@ abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
   }
 
   @override
-  ({
-    String key,
-    String defaultValue,
-    bool defaultEnabled,
-    String title,
-    String? description,
-    Box<SettingEntity> box,
-    Map<String, String> options,
-  }) get params => (
-        key: key,
-        defaultValue: defaultValue,
-        defaultEnabled: defaultEnabled,
-        title: title,
-        description: description,
-        box: box,
-        options: options,
-      );
-  
+  get params => super.params..['options'] = options;
+
   @override
   Future<void> init() async {
     return txn(TxMode.write, (store, p) {
-      final box = p.box;
-      final key = p.key;
-      final defaultValue = p.defaultValue;
-      final title = p.title;
-      final options = p.options;
+      final box = p['box'] as Box<SettingEntity>;
+      final key = p['key'] as String;
+      final defaultValue = p['defaultValue'] as String;
+      final title = p['title'] as String;
+      final options = p['options'] as Map<String, String>;
 
       final entity = box
           .query(SettingEntity_.key.equals(

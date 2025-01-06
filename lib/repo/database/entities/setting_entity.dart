@@ -15,14 +15,7 @@ class SettingEntity {
 
   late DateTime createdAt;
 
-  late DateTime _updatedAt;
-
-  DateTime get updatedAt => _updatedAt;
-  set updatedAt(DateTime value) {
-    if (value.isAfter(createdAt)) {
-      _updatedAt = value;
-    }
-  }
+  late DateTime updatedAt;
 
   SettingEntity({
     int id = 0,
