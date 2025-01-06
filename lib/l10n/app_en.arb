@@ -11,7 +11,7 @@
     "description": "The description of the app",
     "type": "text"
   },
-  "test": "ทดสอบ",
+  "test": "test",
   "@test": {
     "description": "This is a test string",
     "type": "text"
