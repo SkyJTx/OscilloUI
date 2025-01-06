@@ -87,9 +87,19 @@ class OscilloscopeRepo {
     receivePort.listen((message) {
       if (message is SendPort) {
         _sendPort = message;
-        sendPort.send(apiProvider);
-      } else if (message is ImageByteWithTimestamp) {
-        videoStreamController.add(message);
+        sendPort.send({
+          'ip': apiProvider.ip,
+          'port': apiProvider.port.toString(),
+        });
+      } else if (message is Map<String, String>) {
+        if (message.containsKey('timestamp') && message.containsKey('image')) {
+          final image = Uint8List.fromList(message['image']!.codeUnits);
+          final timestamp = DateTime.parse(message['timestamp']!);
+          videoStreamController.add((
+            timestamp: timestamp,
+            image: image,
+          ));
+        }
       }
     });
 
@@ -112,18 +122,28 @@ class OscilloscopeRepo {
 
     final message = await receivePort.first;
 
-    if (message is OscilloscopeApiProvider) {
-      apiProvider = message;
+    if (message is Map<String, String>) {
+      if (!message.containsKey('ip') || !message.containsKey('port')) {
+        throw Exception('Invalid message');
+      }
+      final ip = message['ip']!;
+      final port = message['port']!;
+      apiProvider = OscilloscopeApiProvider(
+        ip: ip,
+        port: int.parse(port),
+      );
+      await apiProvider.connect();
     } else {
       throw Exception('Invalid message');
     }
 
     receivePort.listen((msg) async {
-      if (msg is OscilloscopeVideoCommandStart || msg is OscilloscopeVideoCommandResume) {
+      if (msg == OscilloscopeVideoCommandType.start.command ||
+          msg == OscilloscopeVideoCommandType.resume.command) {
         isCapturing = true;
-      } else if (msg is OscilloscopeVideoCommandPause) {
+      } else if (msg == OscilloscopeVideoCommandType.pause.command) {
         isCapturing = false;
-      } else if (msg is OscilloscopeVideoCommandStop) {
+      } else if (msg == OscilloscopeVideoCommandType.stop.command) {
         isCapturing = false;
         isStopped = true;
       }
@@ -134,25 +154,25 @@ class OscilloscopeRepo {
     while (!isStopped) {
       if (!isCapturing) continue;
       final data = await apiProvider.capture();
-      port.send((
-        timestamp: DateTime.now(),
-        image: data,
-      ));
+      port.send({
+        'timestamp': DateTime.now().toIso8601String(),
+        'image': String.fromCharCodes(data),
+      });
     }
 
     receivePort.close();
   }
 
-  Future<void> sendVideoCommand(OscilloscopeVideoCommand command) async {
-    sendPort.send(command);
-    final msg = await receivePort.first;
-    if (msg.runtimeType != command.runtimeType) {
+  Future<void> sendVideoCommand(OscilloscopeVideoCommandType command) async {
+    sendPort.send(command.command);
+    final msg = await receivePort.first as OscilloscopeVideoCommandType;
+    if (msg.command != command.command) {
       throw Exception('Invalid response');
     }
   }
 
   Future<void> disconnect() async {
-    sendPort.send(OscilloscopeVideoCommandStop());
+    sendPort.send(OscilloscopeVideoCommandType.stop.command);
     videoIsolate.kill(priority: Isolate.immediate);
     receivePort.close();
     await videoStreamController.close();
@@ -169,7 +189,7 @@ class OscilloscopeRepo {
 
   Future<Uint8List> saveCapture() async {
     try {
-      sendVideoCommand(OscilloscopeVideoCommandPause());
+      await sendVideoCommand(OscilloscopeVideoCommandType.pause);
 
       final image = await apiProvider.capture();
       final pathRepo = SettingsRepo().imageSavePath;
@@ -188,7 +208,7 @@ class OscilloscopeRepo {
         }
         await Gal.putImageBytes(
           image,
-          name: 'capture_${DateTime.now().toIso8601String()}.png',
+          name: 'capture_${DateTime.now().toIso8601String()}',
           album: _imageAlbum,
         );
       } else {
@@ -199,7 +219,7 @@ class OscilloscopeRepo {
     } catch (e) {
       rethrow;
     } finally {
-      sendVideoCommand(OscilloscopeVideoCommandResume());
+      await sendVideoCommand(OscilloscopeVideoCommandType.resume);
     }
   }
 }
