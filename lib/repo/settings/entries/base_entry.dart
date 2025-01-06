@@ -11,19 +11,17 @@ abstract class BaseEntry {
   final String title;
   final String? description;
 
-  final storeRepo = StoreRepo();
-  final box = StoreRepo().storeInstance.box<SettingEntity>();
-  final run = StoreRepo().storeInstance.runAsync;
-  FutureOr<Result> txn<Result, Param>(
+  Future<Result> txn<Result, Param>(
     TxMode mode,
     Result Function(Store, Param) callback,
     Param param,
   ) async {
-    return StoreRepo().storeInstance.runInTransaction<Result>(
+    return StoreRepo().storeInstance.runInTransactionAsync<Result, Param>(
       mode,
-      () {
-        return callback(StoreRepo.store, param);
+      (store, param) {
+        return callback(store, param);
       },
+      param,
     );
   }
 
@@ -41,13 +39,12 @@ abstract class BaseEntry {
         'defaultEnabled': defaultEnabled,
         'title': title,
         'description': description,
-        'box': box,
         'options': null,
       };
 
   Future<void> init() async {
     return txn(TxMode.write, (store, p) {
-      final box = p['box'] as Box<SettingEntity>;
+      final box = store.box<SettingEntity>();
       final key = p['key'] as String;
       final defaultValue = p['defaultValue'] as String;
       final title = p['title'] as String;
@@ -74,7 +71,7 @@ abstract class BaseEntry {
 
   Future<String> get value {
     final r = txn(TxMode.read, (store, p) {
-      final box = p['box'] as Box<SettingEntity>;
+      final box = store.box<SettingEntity>();
       final key = p['key'] as String;
       final defaultValue = p['defaultValue'] as String;
 
@@ -91,8 +88,8 @@ abstract class BaseEntry {
   }
 
   Future<void> setValue(String value) {
-    final r =  txn(TxMode.write, (store, p) {
-      final box = p['box'] as Box<SettingEntity>;
+    final r = txn(TxMode.write, (store, p) {
+      final box = store.box<SettingEntity>();
       final key = p['key'] as String;
 
       final entity = box
@@ -113,7 +110,7 @@ abstract class BaseEntry {
 
   Future<void> reset() {
     final r = txn(TxMode.write, (store, p) {
-      final box = p['box'] as Box<SettingEntity>;
+      final box = store.box<SettingEntity>();
       final key = p['key'] as String;
       final defaultValue = p['defaultValue'] as String;
       final title = p['title'] as String;
@@ -144,7 +141,7 @@ abstract class BaseEntry {
 
   Future<void> delete() {
     final r = txn(TxMode.write, (store, p) {
-      final box = p['box'] as Box<SettingEntity>;
+      final box = store.box<SettingEntity>();
       final key = p['key'] as String;
 
       final entity = box
@@ -186,7 +183,7 @@ abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
   @override
   Future<void> init() async {
     return txn(TxMode.write, (store, p) {
-      final box = p['box'] as Box<SettingEntity>;
+      final box = store.box<SettingEntity>();
       final key = p['key'] as String;
       final defaultValue = p['defaultValue'] as String;
       final title = p['title'] as String;

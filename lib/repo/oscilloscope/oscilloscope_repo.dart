@@ -160,6 +160,8 @@ class OscilloscopeRepo {
       });
     }
 
+    await apiProvider.disconnect();
+
     receivePort.close();
   }
 
