@@ -15,5 +15,75 @@
   "@test": {
     "description": "This is a test string",
     "type": "text"
+  },
+  "homeNavigationPaneTitle": "Home",
+  "@homeNavigationPaneTitle": {
+    "description": "The title of the home navigation pane",
+    "type": "text"
+  },
+  "settingsNavigationPaneTitle": "Settings",
+  "@settingsNavigationPaneTitle": {
+    "description": "The title of the settings navigation pane",
+    "type": "text"
+  },
+  "settingsPageTitle": "Settings",
+  "@settingsPageTitle": {
+    "description": "The title of the settings page",
+    "type": "text"
+  },
+  "settingsPageSubtitle": "Change the settings of the app",
+  "@settingsPageSubtitle": {
+    "description": "The subtitle of the settings page",
+    "type": "text"
+  },
+  "settingsPageThemeSettingTitle": "Theme",
+  "@settingsPageThemeSettingTitle": {
+    "description": "The title of the theme setting",
+    "type": "text"
+  },
+  "settingsPageThemeSettingSubtitle": "Change the theme of the app",
+  "@settingsPageThemeSettingSubtitle": {
+    "description": "The subtitle of the theme setting",
+    "type": "text"
+  },
+  "settingsPageThemeSettingOptionSystem": "System",
+  "@settingsPageThemeSettingOptionSystem": {
+    "description": "The system theme option",
+    "type": "text"
+  },
+  "settingsPageThemeSettingOptionLight": "Light",
+  "@settingsPageThemeSettingOptionLight": {
+    "description": "The light theme option",
+    "type": "text"
+  },
+  "settingsPageThemeSettingOptionDark": "Dark",
+  "@settingsPageThemeSettingOptionDark": {
+    "description": "The dark theme option",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingTitle": "Language",
+  "@settingsPageLanguageSettingTitle": {
+    "description": "The title of the language setting",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingSubtitle": "Change the language of the app",
+  "@settingsPageLanguageSettingSubtitle": {
+    "description": "The subtitle of the language setting",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingOptionSystem": "System",
+  "@settingsPageLanguageSettingOptionSystem": {
+    "description": "The system language option",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingOptionEnglish": "English",
+  "@settingsPageLanguageSettingOptionEnglish": {
+    "description": "The English language option",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingOptionThai": "ภาษาไทย",
+  "@settingsPageLanguageSettingOptionThai": {
+    "description": "The Thai language option",
+    "type": "text"
   }
 }

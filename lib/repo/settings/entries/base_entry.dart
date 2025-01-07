@@ -160,19 +160,19 @@ abstract class BaseEntry {
 }
 
 mixin Options<T> on BaseEntry {
-  late Map<T, String> _options = {};
+  late Map<String, T> _options = {};
 
-  Map<T, String> get options => _options;
+  Map<String, T> get options => _options;
 }
 
-abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
+abstract class BaseEntryWithOptions<T> extends BaseEntry with Options<T> {
   BaseEntryWithOptions({
     required super.key,
     required super.defaultValue,
     super.defaultEnabled,
     required super.title,
     super.description,
-    required Map<String, String> options,
+    required Map<String, T> options,
   }) {
     _options = options;
   }
@@ -187,7 +187,7 @@ abstract class BaseEntryWithOptions extends BaseEntry with Options<String> {
       final key = p['key'] as String;
       final defaultValue = p['defaultValue'] as String;
       final title = p['title'] as String;
-      final options = p['options'] as Map<String, String>;
+      final options = p['options'] as Map<String, T>;
 
       final entity = box
           .query(SettingEntity_.key.equals(

@@ -34,12 +34,12 @@ class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
     void Function(T value) setValue,
   ) builder;
 
-  final ValueChangeNotifer<T> valueChangeNotifer;
+  final ValueChangeNotifer<T> valueChangeNotifier;
 
   const ValueChangeNotifierBuilder({
     super.key,
     required this.builder,
-    required this.valueChangeNotifer,
+    required this.valueChangeNotifier,
   });
 
   static ValueChangeNotifierBuilder<Q> easy<Q extends Object?>({
@@ -52,20 +52,20 @@ class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
   }) {
     return ValueChangeNotifierBuilder(
       builder: builder,
-      valueChangeNotifer: ValueChangeNotifer<Q>(initialValue),
+      valueChangeNotifier: ValueChangeNotifer<Q>(initialValue),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ValueChangeNotifer<T>, T>(
-      bloc: valueChangeNotifer,
+      bloc: valueChangeNotifier,
       builder: (context, value) {
         return builder(
           context,
           value,
           (value) {
-            valueChangeNotifer.value = value;
+            valueChangeNotifier.value = value;
           },
         );
       },

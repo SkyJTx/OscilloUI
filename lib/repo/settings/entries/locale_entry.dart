@@ -1,15 +1,17 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:oscillo_ui/repo/settings/entries/base_entry.dart';
 
-class LocaleEntry extends BaseEntryWithOptions {
+class LocaleEntry extends BaseEntryWithOptions<Locale?> {
   LocaleEntry._internal()
       : super(
           key: 'locale',
-          defaultValue: 'en',
+          defaultValue: 'system',
           title: 'Locale',
           description: 'Select the locale (language and time format) for the app',
           options: {
-            'en': 'English (International)',
-            'th': 'Thai (Thailand)',
+            'system': null,
+            'en': Locale('en'),
+            'th': Locale('th'),
           },
         );
 

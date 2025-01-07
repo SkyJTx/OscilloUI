@@ -1,7 +1,7 @@
 {
   "@@locale": "th",
   "@@author": "SkyJT",
-  "title": "OscilloUI",
+  "title": "ออสซิโลยูไอ",
   "@title": {
     "description": "ชื่อแอป",
     "type": "text"
@@ -14,6 +14,76 @@
   "test": "ทดสอบ",
   "@test": {
     "description": "นี่คือข้อความทดสอบ",
+    "type": "text"
+  },
+  "homeNavigationPaneTitle": "หน้าหลัก",
+  "@homeNavigationPaneTitle": {
+    "description": "ชื่อเมนูนำทางหน้าหลัก",
+    "type": "text"
+  },
+  "settingsNavigationPaneTitle": "การตั้งค่า",
+  "@settingsNavigationPaneTitle": {
+    "description": "ชื่อเมนูนำทางการตั้งค่า",
+    "type": "text"
+  },
+  "settingsPageTitle": "การตั้งค่า",
+  "@settingsPageTitle": {
+    "description": "ชื่อหน้าการตั้งค่า",
+    "type": "text"
+  },
+  "settingsPageSubtitle": "ปรับแต่งการตั้งค่าของคุณ",
+  "@settingsPageSubtitle": {
+    "description": "คำอธิบายหน้าการตั้งค่า",
+    "type": "text"
+  },
+  "settingsPageThemeSettingTitle": "ธีม",
+  "@settingsPageThemeSettingTitle": {
+    "description": "ชื่อการตั้งค่าธีม",
+    "type": "text"
+  },
+  "settingsPageThemeSettingSubtitle": "เลือกธีมที่คุณต้องการ",
+  "@settingsPageThemeSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าธีม",
+    "type": "text"
+  },
+  "settingsPageThemeSettingOptionSystem": "ระบบ",
+  "@settingsPageThemeSettingOptionSystem": {
+    "description": "ตัวเลือกธีมระบบ",
+    "type": "text"
+  },
+  "settingsPageThemeSettingOptionLight": "สว่าง",
+  "@settingsPageThemeSettingOptionLight": {
+    "description": "ตัวเลือกธีมสว่าง",
+    "type": "text"
+  },
+  "settingsPageThemeSettingOptionDark": "มืด",
+  "@settingsPageThemeSettingOptionDark": {
+    "description": "ตัวเลือกธีมมืด",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingTitle": "ภาษา",
+  "@settingsPageLanguageSettingTitle": {
+    "description": "ชื่อการตั้งค่าภาษา",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingSubtitle": "เลือกภาษาที่คุณต้องการ",
+  "@settingsPageLanguageSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าภาษา",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingOptionSystem": "ระบบ",
+  "@settingsPageLanguageSettingOptionSystem": {
+    "description": "ตัวเลือกภาษาระบบ",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingOptionEnglish": "English",
+  "@settingsPageLanguageSettingOptionEnglish": {
+    "description": "ตัวเลือกภาษาอังกฤษ",
+    "type": "text"
+  },
+  "settingsPageLanguageSettingOptionThai": "ภาษาไทย",
+  "@settingsPageLanguageSettingOptionThai": {
+    "description": "ตัวเลือกภาษาไทย",
     "type": "text"
   }
 }

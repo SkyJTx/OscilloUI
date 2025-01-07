@@ -1,38 +1,49 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:oscillo_ui/component/theme/theme_provider.dart';
-import 'package:oscillo_ui/component/theme/theme_state.dart';
 import 'package:oscillo_ui/constant/theme.dart';
+import 'package:oscillo_ui/page/settings_page/settings_cubit.dart';
 
 class ThemeBuilder extends StatelessWidget {
   final Widget Function(
     BuildContext context,
-    ThemeData currentTheme,
-    ThemeData lightTheme,
-    ThemeData darkTheme,
+    FluentThemeData currentTheme,
+    FluentThemeData lightTheme,
+    FluentThemeData darkTheme,
     ThemeMode themeMode,
   ) builder;
 
+  final SettingsCubit settingsCubit;
+
   const ThemeBuilder({
     super.key,
+    required this.settingsCubit,
     required this.builder,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeProvider()..init(),
-      child: BlocBuilder<ThemeProvider, ThemeState>(
-        builder: (context, state) {
-          return builder(
-            context,
-            state.themeData(),
-            lightTheme,
-            darkTheme,
-            state.themeMode(),
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        if (!state.isInitialized) {
+          return FluentTheme(
+            data: systemTheme,
+            child: Center(
+              child: ProgressRing(),
+            ),
           );
-        },
-      ),
+        }
+        return builder(
+          context,
+          switch (state.theme.value) {
+            ThemeMode.light => lightTheme,
+            ThemeMode.dark => darkTheme,
+            ThemeMode.system => systemTheme,
+          },
+          lightTheme,
+          darkTheme,
+          state.theme.value,
+        );
+      },
     );
   }
 }

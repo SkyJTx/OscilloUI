@@ -1,29 +1,21 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/scheduler.dart';
 
-final _lightTheme = ThemeData.from(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.amber,
-    brightness: Brightness.light,
-    dynamicSchemeVariant: DynamicSchemeVariant.content,
-  ),
+final _lightTheme = FluentThemeData(
+  brightness: Brightness.light,
+  accentColor: Colors.orange,
 );
 
-final _darkTheme = ThemeData.from(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.amber,
-    brightness: Brightness.dark,
-    dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-  ),
+final _darkTheme = FluentThemeData(
+  brightness: Brightness.dark,
+  accentColor: Colors.orange,
 );
 
-final lightTextTheme = GoogleFonts.kanitTextTheme(_lightTheme.textTheme);
-final darkTextTheme = GoogleFonts.kanitTextTheme(_darkTheme.textTheme);
+FluentThemeData get lightTheme => _lightTheme;
 
-final lightTheme = _lightTheme.copyWith(
-  textTheme: lightTextTheme,
-);
+FluentThemeData get darkTheme => _darkTheme;
 
-final darkTheme = _darkTheme.copyWith(
-  textTheme: darkTextTheme,
-);
+FluentThemeData get systemTheme {
+  final Brightness brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  return brightness == Brightness.dark ? darkTheme : lightTheme;
+}
