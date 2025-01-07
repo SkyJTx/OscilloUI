@@ -14,6 +14,8 @@ class SettingsPageState extends State<SettingsPage> {
   final themeScroller = ScrollController();
   final themeExpanderState = GlobalKey<ExpanderState>();
   final languageExpanderState = GlobalKey<ExpanderState>();
+  final connectionExpanderState = GlobalKey<ExpanderState>();
+  final captureExpanderState = GlobalKey<ExpanderState>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,125 @@ class SettingsPageState extends State<SettingsPage> {
                       style: theme.typography.subtitle,
                     ),
                   ),
+                  SizedBox(height: 16),
+                  Expander(
+                    key: connectionExpanderState,
+                    header: ListTile(
+                      leading: Icon(FluentIcons.info),
+                      title: Text(
+                        locale.settingsPageConnectionSettingTitle,
+                        style: theme.typography.body,
+                      ),
+                      subtitle: Text(
+                        locale.settingsPageConnectionSettingSubtitle,
+                        style: theme.typography.caption,
+                      ),
+                    ),
+                    onStateChanged: (value) {
+                      if (value) {
+                        captureExpanderState.currentState?.isExpanded = false;
+                        themeExpanderState.currentState?.isExpanded = false;
+                        languageExpanderState.currentState?.isExpanded = false;
+                      }
+                    },
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 8,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              locale.settingsPageHostSettingTitle,
+                              style: theme.typography.body,
+                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 400),
+                              child: TextBox(
+                                placeholder: locale.settingsPageHostSettingSubtitle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              locale.settingsPagePortSettingTitle,
+                              style: theme.typography.body,
+                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 400),
+                              child: TextBox(
+                                keyboardType: TextInputType.number,
+                                maxLength: 5,
+                                placeholder: locale.settingsPagePortSettingSubtitle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Expander(
+                    key: captureExpanderState,
+                    header: ListTile(
+                      leading: Icon(FluentIcons.file_image),
+                      title: Text(
+                        locale.settingsPageCaptureSettingTitle,
+                        style: theme.typography.body,
+                      ),
+                      subtitle: Text(
+                        locale.settingsPageCaptureSettingSubtitle,
+                        style: theme.typography.caption,
+                      ),
+                    ),
+                    onStateChanged: (value) {
+                      if (value) {
+                        connectionExpanderState.currentState?.isExpanded = false;
+                        themeExpanderState.currentState?.isExpanded = false;
+                        languageExpanderState.currentState?.isExpanded = false;
+                      }
+                    },
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 8,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              locale.settingsPageImageSavePathSettingTitle,
+                              style: theme.typography.body,
+                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 400),
+                              child: TextBox(
+                                placeholder: locale.settingsPageImageSavePathSettingSubtitle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              locale.settingsPageVideoSavePathSettingTitle,
+                              style: theme.typography.body,
+                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 400),
+                              child: TextBox(
+                                placeholder: locale.settingsPageVideoSavePathSettingSubtitle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 8),
                   Expander(
                     key: themeExpanderState,
                     header: ListTile(
@@ -63,6 +184,8 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                     onStateChanged: (value) {
                       if (value) {
+                        connectionExpanderState.currentState?.isExpanded = false;
+                        captureExpanderState.currentState?.isExpanded = false;
                         languageExpanderState.currentState?.isExpanded = false;
                       }
                     },
@@ -154,6 +277,8 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                     onStateChanged: (value) {
                       if (value) {
+                        connectionExpanderState.currentState?.isExpanded = false;
+                        captureExpanderState.currentState?.isExpanded = false;
                         themeExpanderState.currentState?.isExpanded = false;
                       }
                     },

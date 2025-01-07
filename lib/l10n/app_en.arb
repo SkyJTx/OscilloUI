@@ -85,5 +85,65 @@
   "@settingsPageLanguageSettingOptionThai": {
     "description": "The Thai language option",
     "type": "text"
+  },
+  "settingsPageConnectionSettingTitle": "Connection",
+  "@settingsPageConnectionSettingTitle": {
+    "description": "The title of the connection setting",
+    "type": "text"
+  },
+  "settingsPageConnectionSettingSubtitle": "Change the connection settings for oscilloscope",
+  "@settingsPageConnectionSettingSubtitle": {
+    "description": "The subtitle of the connection setting",
+    "type": "text"
+  },
+  "settingsPageHostSettingTitle": "Hostname",
+  "@settingsPageHostSettingTitle": {
+    "description": "The title of the hostname setting",
+    "type": "text"
+  },
+  "settingsPageHostSettingSubtitle": "Change the hostname for oscilloscope connection",
+  "@settingsPageHostSettingSubtitle": {
+    "description": "The subtitle of the host setting",
+    "type": "text"
+  },
+  "settingsPagePortSettingTitle": "Port",
+  "@settingsPagePortSettingTitle": {
+    "description": "The title of the port setting",
+    "type": "text"
+  },
+  "settingsPagePortSettingSubtitle": "Change the port for oscilloscope connection",
+  "@settingsPagePortSettingSubtitle": {
+    "description": "The subtitle of the port setting",
+    "type": "text"
+  },
+  "settingsPageCaptureSettingTitle": "Capture",
+  "@settingsPageCaptureSettingTitle": {
+    "description": "The title of the capture setting",
+    "type": "text"
+  },
+  "settingsPageCaptureSettingSubtitle": "Change the capture settings for oscilloscope",
+  "@settingsPageCaptureSettingSubtitle": {
+    "description": "The subtitle of the capture setting",
+    "type": "text"
+  },
+  "settingsPageImageSavePathSettingTitle": "Image Save Path",
+  "@settingsPageImageSavePathSettingTitle": {
+    "description": "The title of the image save path setting",
+    "type": "text"
+  },
+  "settingsPageImageSavePathSettingSubtitle": "Change the image save path for oscilloscope capture",
+  "@settingsPageImageSavePathSettingSubtitle": {
+    "description": "The subtitle of the image save path setting",
+    "type": "text"
+  },
+  "settingsPageVideoSavePathSettingTitle": "Video Save Path",
+  "@settingsPageVideoSavePathSettingTitle": {
+    "description": "The title of the video save path setting",
+    "type": "text"
+  },
+  "settingsPageVideoSavePathSettingSubtitle": "Change the video save path for oscilloscope capture",
+  "@settingsPageVideoSavePathSettingSubtitle": {
+    "description": "The subtitle of the video save path setting",
+    "type": "text"
   }
 }

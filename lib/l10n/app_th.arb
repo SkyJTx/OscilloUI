@@ -85,5 +85,65 @@
   "@settingsPageLanguageSettingOptionThai": {
     "description": "ตัวเลือกภาษาไทย",
     "type": "text"
+  },
+  "settingsPageHostSettingTitle": "โฮสต์เนม",
+  "@settingsPageHostSettingTitle": {
+    "description": "ชื่อการตั้งค่าโฮสต์",
+    "type": "text"
+  },
+  "settingsPageHostSettingSubtitle": "ตั้งค่าโฮสต์เนมของคุณ",
+  "@settingsPageHostSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าโฮสต์",
+    "type": "text"
+  },
+  "settingsPagePortSettingTitle": "พอร์ต",
+  "@settingsPagePortSettingTitle": {
+    "description": "ชื่อการตั้งค่าพอร์ต",
+    "type": "text"
+  },
+  "settingsPagePortSettingSubtitle": "ตั้งค่าพอร์ตของคุณ",
+  "@settingsPagePortSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าพอร์ต",
+    "type": "text"
+  },
+  "settingsPageImageSavePathSettingTitle": "เส้นทางบันทึกรูปภาพ",
+  "@settingsPageImageSavePathSettingTitle": {
+    "description": "ชื่อการตั้งค่าเส้นทางบันทึกรูปภาพ",
+    "type": "text"
+  },
+  "settingsPageImageSavePathSettingSubtitle": "ตั้งค่าเส้นทางบันทึกรูปภาพของคุณ",
+  "@settingsPageImageSavePathSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าเส้นทางบันทึกรูปภาพ",
+    "type": "text"
+  },
+  "settingsPageVideoSavePathSettingTitle": "เส้นทางบันทึกวิดีโอ",
+  "@settingsPageVideoSavePathSettingTitle": {
+    "description": "ชื่อการตั้งค่าเส้นทางบันทึกวิดีโอ",
+    "type": "text"
+  },
+  "settingsPageVideoSavePathSettingSubtitle": "ตั้งค่าเส้นทางบันทึกวิดีโอของคุณ",
+  "@settingsPageVideoSavePathSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าเส้นทางบันทึกวิดีโอ",
+    "type": "text"
+  },
+  "settingsPageConnectionSettingTitle": "การตั้งค่าการเชื่อมต่อ",
+  "@settingsPageConnectionSettingTitle": {
+    "description": "ชื่อการตั้งค่าการเชื่อมต่อ",
+    "type": "text"
+  },
+  "settingsPageConnectionSettingSubtitle": "ตั้งค่าการเชื่อมต่อของคุณ",
+  "@settingsPageConnectionSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าการเชื่อมต่อ",
+    "type": "text"
+  },
+  "settingsPageCaptureSettingTitle": "การตั้งค่าการจับภาพและวิดีโอ",
+  "@settingsPageCaptureSettingTitle": {
+    "description": "ชื่อการตั้งค่าการจับภาพและวิดีโอ",
+    "type": "text"
+  },
+  "settingsPageCaptureSettingSubtitle": "ตั้งค่าการจับภาพและวิดีโอของคุณ",
+  "@settingsPageCaptureSettingSubtitle": {
+    "description": "คำอธิบายการตั้งค่าการจับภาพและวิดีโอ",
+    "type": "text"
   }
 }
