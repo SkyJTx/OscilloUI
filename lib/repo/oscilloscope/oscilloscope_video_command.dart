@@ -1,4 +1,5 @@
 enum OscilloscopeVideoCommandType {
+  ready,
   start,
   pause,
   resume,
@@ -6,6 +7,8 @@ enum OscilloscopeVideoCommandType {
 
   String get command {
     switch (this) {
+      case OscilloscopeVideoCommandType.ready:
+        return 'ready';
       case OscilloscopeVideoCommandType.start:
         return 'start';
       case OscilloscopeVideoCommandType.pause:

@@ -26,6 +26,11 @@
     "description": "The title of the settings navigation pane",
     "type": "text"
   },
+  "galleryNavigationPaneTitle": "Gallery",
+  "@galleryNavigationPaneTitle": {
+    "description": "The title of the gallery navigation pane",
+    "type": "text"
+  },
   "settingsPageTitle": "Settings",
   "@settingsPageTitle": {
     "description": "The title of the settings page",
@@ -71,7 +76,7 @@
     "description": "The subtitle of the language setting",
     "type": "text"
   },
-  "settingsPageLanguageSettingOptionSystem": "System",
+  "settingsPageLanguageSettingOptionSystem": "System (English)",
   "@settingsPageLanguageSettingOptionSystem": {
     "description": "The system language option",
     "type": "text"
@@ -91,7 +96,7 @@
     "description": "The title of the connection setting",
     "type": "text"
   },
-  "settingsPageConnectionSettingSubtitle": "Change the connection settings for oscilloscope",
+  "settingsPageConnectionSettingSubtitle": "Change the connection settings of the oscilloscope",
   "@settingsPageConnectionSettingSubtitle": {
     "description": "The subtitle of the connection setting",
     "type": "text"
@@ -101,9 +106,14 @@
     "description": "The title of the hostname setting",
     "type": "text"
   },
-  "settingsPageHostSettingSubtitle": "Change the hostname for oscilloscope connection",
+  "settingsPageHostSettingSubtitle": "Change the hostname of the oscilloscope connection",
   "@settingsPageHostSettingSubtitle": {
     "description": "The subtitle of the host setting",
+    "type": "text"
+  },
+  "settingsPageHostSettingHint": "Enter the hostname of the oscilloscope",
+  "@settingsPageHostSettingHint": {
+    "description": "The hint of the host setting",
     "type": "text"
   },
   "settingsPagePortSettingTitle": "Port",
@@ -111,9 +121,14 @@
     "description": "The title of the port setting",
     "type": "text"
   },
-  "settingsPagePortSettingSubtitle": "Change the port for oscilloscope connection",
+  "settingsPagePortSettingSubtitle": "Change the port of the oscilloscope connection",
   "@settingsPagePortSettingSubtitle": {
     "description": "The subtitle of the port setting",
+    "type": "text"
+  },
+  "settingsPagePortSettingHint": "Enter the port of the oscilloscope",
+  "@settingsPagePortSettingHint": {
+    "description": "The hint of the port setting",
     "type": "text"
   },
   "settingsPageCaptureSettingTitle": "Capture",
@@ -121,7 +136,7 @@
     "description": "The title of the capture setting",
     "type": "text"
   },
-  "settingsPageCaptureSettingSubtitle": "Change the capture settings for oscilloscope",
+  "settingsPageCaptureSettingSubtitle": "Change the capture settings of the osilloscope",
   "@settingsPageCaptureSettingSubtitle": {
     "description": "The subtitle of the capture setting",
     "type": "text"
@@ -131,9 +146,14 @@
     "description": "The title of the image save path setting",
     "type": "text"
   },
-  "settingsPageImageSavePathSettingSubtitle": "Change the image save path for oscilloscope capture",
+  "settingsPageImageSavePathSettingSubtitle": "Change the image save path of the osilloscope capture",
   "@settingsPageImageSavePathSettingSubtitle": {
     "description": "The subtitle of the image save path setting",
+    "type": "text"
+  },
+  "settingsPageImageSavePathSettingHint": "Enter the image save path of the oscilloscope",
+  "@settingsPageImageSavePathSettingHint": {
+    "description": "The hint of the image save path setting",
     "type": "text"
   },
   "settingsPageVideoSavePathSettingTitle": "Video Save Path",
@@ -141,9 +161,99 @@
     "description": "The title of the video save path setting",
     "type": "text"
   },
-  "settingsPageVideoSavePathSettingSubtitle": "Change the video save path for oscilloscope capture",
+  "settingsPageVideoSavePathSettingSubtitle": "Change the video save path of the osilloscope capture",
   "@settingsPageVideoSavePathSettingSubtitle": {
     "description": "The subtitle of the video save path setting",
+    "type": "text"
+  },
+  "settingsPageVideoSavePathSettingHint": "Enter the video save path of the oscilloscope",
+  "@settingsPageVideoSavePathSettingHint": {
+    "description": "The hint of the video save path setting",
+    "type": "text"
+  },
+  "textFormFieldRequiredError": "This field is required",
+  "@textFormFieldRequiredError": {
+    "description": "The error message for required text form field",
+    "type": "text"
+  },
+  "textFormFieldInvalidError": "This field is invalid",
+  "@textFormFieldInvalidError": {
+    "description": "The error message for invalid text form field",
+    "type": "text"
+  },
+  "editText": "Edit",
+  "@editText": {
+    "description": "The edit text",
+    "type": "text"
+  },
+  "saveText": "Save",
+  "@saveText": {
+    "description": "The save text",
+    "type": "text"
+  },
+  "errorText": "Error",
+  "@errorText": {
+    "description": "An error text",
+    "type": "text"
+  },
+  "acceptText": "Accept",
+  "@acceptText": {
+    "description": "An accept text",
+    "type": "text"
+  },
+  "cancelText": "Cancel",
+  "@cancelText": {
+    "description": "A cancel text",
+    "type": "text"
+  },
+  "connectText": "Connect",
+  "@connectText": {
+    "description": "A connect text",
+    "type": "text"
+  },
+  "connectedText": "Connected",
+  "@connectedText": {
+    "description": "A connected text",
+    "type": "text"
+  },
+  "notConnectedText": "Not Connected",
+  "@notConnectedText": {
+    "description": "A not connected text",
+    "type": "text"
+  },
+  "disconnectText": "Disconnect",
+  "@disconnectText": {
+    "description": "A disconnect text",
+    "type": "text"
+  },
+  "disconnectedText": "Disconnected",
+  "@disconnectedText": {
+    "description": "A disconnected text",
+    "type": "text"
+  },
+  "waitingText": "Please wait",
+  "@waitingText": {
+    "description": "A waiting text",
+    "type": "text"
+  },
+  "unknownError": "An unknown error occurred",
+  "@unknownError": {
+    "description": "An unknown error message",
+    "type": "text"
+  },
+  "timeoutError": "Connection timed out",
+  "@timeoutError": {
+    "description": "A timeout error message",
+    "type": "text"
+  },
+  "unsupportedPlatformError": "Unsupported platform",
+  "@unsupportedPlatformError": {
+    "description": "An unsupported platform error message",
+    "type": "text"
+  },
+  "requestError": "Request error",
+  "@requestError": {
+    "description": "A request error message",
     "type": "text"
   }
 }

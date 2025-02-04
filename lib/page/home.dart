@@ -1,9 +1,14 @@
+import 'dart:developer';
+
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:oscillo_ui/component/value_change_notifier/value_change_notifier.dart';
+import 'package:oscillo_ui/constant/oscilloscope.dart';
+import 'package:oscillo_ui/page/gallery_page/gallery_page.dart';
 import 'package:oscillo_ui/page/main_page/main_page.dart';
 import 'package:oscillo_ui/page/settings_page/settings_page.dart';
+import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_repo.dart';
+import 'package:oscillo_ui/repo/settings/settings_repo.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,12 +22,13 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = AppLocalizations.of(context);
     return ValueChangeNotifierBuilder<int?>(
       valueChangeNotifier: navigationPaneSelector,
-      builder: (context, value, setValue) {
+      builder: (context, value, setValue, child) {
         return NavigationView(
           appBar: NavigationAppBar(
-            title: Text(AppLocalizations.of(context)!.title),
+            title: Text(locale.title),
           ),
           pane: NavigationPane(
             selected: value,
@@ -30,13 +36,20 @@ class HomeState extends State<Home> {
             onItemPressed: setValue,
             items: [
               PaneItem(
-                icon: Icon(Icons.home),
-                title: Text(AppLocalizations.of(context)!.homeNavigationPaneTitle),
+                icon: Icon(FluentIcons.home),
+                title: Text(locale.homeNavigationPaneTitle),
                 body: MainPage(),
               ),
               PaneItem(
-                icon: Icon(Icons.settings),
-                title: Text(AppLocalizations.of(context)!.settingsNavigationPaneTitle),
+                icon: Icon(FluentIcons.photo_collection),
+                title: Text(locale.galleryNavigationPaneTitle),
+                body: GalleryPage(),
+              ),
+            ],
+            footerItems: [
+              PaneItem(
+                icon: Icon(FluentIcons.settings),
+                title: Text(locale.settingsNavigationPaneTitle),
                 body: SettingsPage(),
               ),
             ],

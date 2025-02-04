@@ -12,11 +12,11 @@ class ThemeBuilder extends StatelessWidget {
     ThemeMode themeMode,
   ) builder;
 
-  final SettingsCubit settingsCubit;
+  final SettingsCubit? settingsCubit;
 
   const ThemeBuilder({
     super.key,
-    required this.settingsCubit,
+    this.settingsCubit,
     required this.builder,
   });
 

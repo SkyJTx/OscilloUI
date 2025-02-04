@@ -1,20 +1,20 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
-import 'package:gal/gal.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:oscillo_ui/component/errors/error_base.dart';
+import 'package:oscillo_ui/constant/oscilloscope.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_api_provider.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_video_command.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
-
-typedef ImageByteWithTimestamp = ({
-  DateTime timestamp,
-  Uint8List image,
-});
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 
 class OscilloscopeRepo {
-  static final String _imageAlbum = 'Oscilloscope';
 
   static final OscilloscopeRepo _instance = OscilloscopeRepo._internal();
 
@@ -25,6 +25,8 @@ class OscilloscopeRepo {
   OscilloscopeApiProvider? _apiProvider;
 
   StreamController<ImageByteWithTimestamp>? _videoStreamController;
+
+  Stream<ImageByteWithTimestamp>? _videoStream;
 
   Isolate? _videoIsolate;
 
@@ -44,6 +46,11 @@ class OscilloscopeRepo {
       throw Exception('Video Stream is not initialized');
     }
     return _videoStreamController!;
+  }
+
+  Stream<ImageByteWithTimestamp> get videoStream {
+    _videoStream ??= videoStreamController.stream.asBroadcastStream();
+    return _videoStream!;
   }
 
   Isolate get videoIsolate {
@@ -82,9 +89,11 @@ class OscilloscopeRepo {
     await apiProvider.connect();
 
     _videoStreamController = StreamController<ImageByteWithTimestamp>.broadcast();
+    _videoStream = videoStreamController.stream.asBroadcastStream();
 
     _receivePort = ReceivePort();
     receivePort.listen((message) {
+      log('Received message (Main Thread) at ${DateTime.now()}');
       if (message is SendPort) {
         _sendPort = message;
         sendPort.send({
@@ -100,10 +109,13 @@ class OscilloscopeRepo {
             image: image,
           ));
         }
+      } else if (message == OscilloscopeVideoCommandType.ready.command) {
+        sendPort.send(OscilloscopeVideoCommandType.start.command);
+        log('Send start command');
       }
     });
 
-    _videoIsolate = await Isolate.spawn(
+    _videoIsolate = await Isolate.spawn<SendPort>(
       _videoIsolateEntryPoint,
       receivePort.sendPort,
       debugName: 'OscilloscopeVideoIsolate',
@@ -112,34 +124,33 @@ class OscilloscopeRepo {
     _isConnected = true;
   }
 
-  Future<void> _videoIsolateEntryPoint(SendPort port) async {
+  static Future<void> _videoIsolateEntryPoint(SendPort port) async {
     late final OscilloscopeApiProvider apiProvider;
+    final frameTime = (1/60).milliseconds;
     bool isCapturing = false;
     bool isStopped = false;
+    Completer<void> initCompleter = Completer();
 
     final receivePort = ReceivePort();
-    port.send(receivePort.sendPort);
-
-    final message = await receivePort.first;
-
-    if (message is Map<String, String>) {
-      if (!message.containsKey('ip') || !message.containsKey('port')) {
-        throw Exception('Invalid message');
-      }
-      final ip = message['ip']!;
-      final port = message['port']!;
-      apiProvider = OscilloscopeApiProvider(
-        ip: ip,
-        port: int.parse(port),
-      );
-      await apiProvider.connect();
-    } else {
-      throw Exception('Invalid message');
-    }
-
     receivePort.listen((msg) async {
-      if (msg == OscilloscopeVideoCommandType.start.command ||
-          msg == OscilloscopeVideoCommandType.resume.command) {
+      log('Received message (Video Isolate) at ${DateTime.now()}');
+      if (msg is Map<String, String>) {
+        if (!msg.containsKey('ip') || !msg.containsKey('port')) {
+          throw Exception('Invalid message');
+        }
+        final ip = msg['ip']!;
+        final port = msg['port']!;
+        apiProvider = OscilloscopeApiProvider(
+          ip: ip,
+          port: int.parse(port),
+        );
+        await apiProvider.connect();
+        log('Connected to oscilloscope');
+        initCompleter.complete();
+      } else if (msg == OscilloscopeVideoCommandType.start.command) {
+        log('Start capturing');
+        isCapturing = true;
+      } else if (msg == OscilloscopeVideoCommandType.resume.command) {
         isCapturing = true;
       } else if (msg == OscilloscopeVideoCommandType.pause.command) {
         isCapturing = false;
@@ -147,17 +158,26 @@ class OscilloscopeRepo {
         isCapturing = false;
         isStopped = true;
       }
-
-      port.send(msg);
     });
 
+    port.send(receivePort.sendPort);
+    await initCompleter.future;
+    log('Video isolate is ready');
+    port.send(OscilloscopeVideoCommandType.ready.command);
+
+    late DateTime startTime;
     while (!isStopped) {
-      if (!isCapturing) continue;
-      final data = await apiProvider.capture();
-      port.send({
-        'timestamp': DateTime.now().toIso8601String(),
-        'image': String.fromCharCodes(data),
-      });
+      startTime = DateTime.now();
+      if (isCapturing) {
+        log('Capturing image');
+        final data = await apiProvider.capture();
+        port.send({
+          'timestamp': DateTime.now().toIso8601String(),
+          'image': String.fromCharCodes(data),
+        });
+      }
+      final waitTime = frameTime - DateTime.now().difference(startTime);
+      await Future.delayed(waitTime > Duration.zero ? waitTime : Duration.zero);
     }
 
     await apiProvider.disconnect();
@@ -178,10 +198,12 @@ class OscilloscopeRepo {
     videoIsolate.kill(priority: Isolate.immediate);
     receivePort.close();
     await videoStreamController.close();
+    await videoStream.drain();
     await apiProvider.disconnect();
 
     _apiProvider = null;
     _videoStreamController = null;
+    _videoStream = null;
     _videoIsolate = null;
     _receivePort = null;
     _sendPort = null;
@@ -189,39 +211,18 @@ class OscilloscopeRepo {
     _isConnected = false;
   }
 
-  Future<Uint8List> saveCapture() async {
-    try {
-      await sendVideoCommand(OscilloscopeVideoCommandType.pause);
-
-      final image = await apiProvider.capture();
-      final pathRepo = SettingsRepo().imageSavePath;
-      if (image.isEmpty) {
-        throw Exception('Failed to capture image');
-      }
-
-      if (await pathRepo.isEnabled) {
-        final folderPath = await pathRepo.value;
-        final path = '$folderPath/capture_${DateTime.now().toIso8601String()}.png';
-        final file = File(path);
-        await file.writeAsBytes(image);
-      } else if (Platform.isAndroid || Platform.isIOS) {
-        if (!await Gal.requestAccess(toAlbum: true)) {
-          throw Exception('Permission denied');
-        }
-        await Gal.putImageBytes(
-          image,
-          name: 'capture_${DateTime.now().toIso8601String()}',
-          album: _imageAlbum,
-        );
-      } else {
-        throw Exception('Saving image is not supported on this platform');
-      }
-
-      return image;
-    } catch (e) {
-      rethrow;
-    } finally {
-      await sendVideoCommand(OscilloscopeVideoCommandType.resume);
+  Future<void> capture({String? fileName}) async {
+    
+    final data = await apiProvider.capture();
+    final name = fileName ?? 'capture_${DateTime.now().millisecondsSinceEpoch}';
+    
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      final savePath = await SettingsRepo().imageSavePath.value;
+      final path = '$savePath/$name.png';
+      final file = await File(path).create(recursive: true);
+      await file.writeAsBytes(data);
+    } else {
+      throw UnsupportedPlatformError();
     }
   }
 }

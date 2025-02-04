@@ -26,12 +26,17 @@
     "description": "ชื่อเมนูนำทางการตั้งค่า",
     "type": "text"
   },
+  "galleryNavigationPaneTitle": "แกลเลอรี",
+  "@galleryNavigationPaneTitle": {
+    "description": "ชื่อเมนูนำทางแกลเลอรี",
+    "type": "text"
+  },
   "settingsPageTitle": "การตั้งค่า",
   "@settingsPageTitle": {
     "description": "ชื่อหน้าการตั้งค่า",
     "type": "text"
   },
-  "settingsPageSubtitle": "ปรับแต่งการตั้งค่าของคุณ",
+  "settingsPageSubtitle": "ปรับแต่งการตั้งค่า",
   "@settingsPageSubtitle": {
     "description": "คำอธิบายหน้าการตั้งค่า",
     "type": "text"
@@ -71,7 +76,7 @@
     "description": "คำอธิบายการตั้งค่าภาษา",
     "type": "text"
   },
-  "settingsPageLanguageSettingOptionSystem": "ระบบ",
+  "settingsPageLanguageSettingOptionSystem": "ระบบ (ภาษาไทย)",
   "@settingsPageLanguageSettingOptionSystem": {
     "description": "ตัวเลือกภาษาระบบ",
     "type": "text"
@@ -91,7 +96,7 @@
     "description": "ชื่อการตั้งค่าโฮสต์",
     "type": "text"
   },
-  "settingsPageHostSettingSubtitle": "ตั้งค่าโฮสต์เนมของคุณ",
+  "settingsPageHostSettingSubtitle": "ตั้งค่าโฮสต์เนม",
   "@settingsPageHostSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าโฮสต์",
     "type": "text"
@@ -101,7 +106,7 @@
     "description": "ชื่อการตั้งค่าพอร์ต",
     "type": "text"
   },
-  "settingsPagePortSettingSubtitle": "ตั้งค่าพอร์ตของคุณ",
+  "settingsPagePortSettingSubtitle": "ตั้งค่าพอร์ต",
   "@settingsPagePortSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าพอร์ต",
     "type": "text"
@@ -111,7 +116,7 @@
     "description": "ชื่อการตั้งค่าเส้นทางบันทึกรูปภาพ",
     "type": "text"
   },
-  "settingsPageImageSavePathSettingSubtitle": "ตั้งค่าเส้นทางบันทึกรูปภาพของคุณ",
+  "settingsPageImageSavePathSettingSubtitle": "ตั้งค่าเส้นทางบันทึกรูปภาพ",
   "@settingsPageImageSavePathSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าเส้นทางบันทึกรูปภาพ",
     "type": "text"
@@ -121,7 +126,7 @@
     "description": "ชื่อการตั้งค่าเส้นทางบันทึกวิดีโอ",
     "type": "text"
   },
-  "settingsPageVideoSavePathSettingSubtitle": "ตั้งค่าเส้นทางบันทึกวิดีโอของคุณ",
+  "settingsPageVideoSavePathSettingSubtitle": "ตั้งค่าเส้นทางบันทึกวิดีโอ",
   "@settingsPageVideoSavePathSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าเส้นทางบันทึกวิดีโอ",
     "type": "text"
@@ -131,7 +136,7 @@
     "description": "ชื่อการตั้งค่าการเชื่อมต่อ",
     "type": "text"
   },
-  "settingsPageConnectionSettingSubtitle": "ตั้งค่าการเชื่อมต่อของคุณ",
+  "settingsPageConnectionSettingSubtitle": "ตั้งค่าการเชื่อมต่อ",
   "@settingsPageConnectionSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าการเชื่อมต่อ",
     "type": "text"
@@ -141,9 +146,114 @@
     "description": "ชื่อการตั้งค่าการจับภาพและวิดีโอ",
     "type": "text"
   },
-  "settingsPageCaptureSettingSubtitle": "ตั้งค่าการจับภาพและวิดีโอของคุณ",
+  "settingsPageCaptureSettingSubtitle": "ตั้งค่าการจับภาพและวิดีโอ",
   "@settingsPageCaptureSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าการจับภาพและวิดีโอ",
+    "type": "text"
+  },
+  "settingsPageHostSettingHint": "กรุณาใส่โฮสต์เนม",
+  "@settingsPageHostSettingHint": {
+    "description": "คำแนะนำการตั้งค่าโฮสต์เนม",
+    "type": "text"
+  },
+  "settingsPagePortSettingHint": "กรุณาใส่พอร์ต",
+  "@settingsPagePortSettingHint": {
+    "description": "คำแนะนำการตั้งค่าพอร์ต",
+    "type": "text"
+  },
+  "settingsPageImageSavePathSettingHint": "กรุณาใส่เส้นทางบันทึกรูปภาพ",
+  "@settingsPageImageSavePathSettingHint": {
+    "description": "คำแนะนำการตั้งค่าเส้นทางบันทึกรูปภาพ",
+    "type": "text"
+  },
+  "settingsPageVideoSavePathSettingHint": "กรุณาใส่เส้นทางบันทึกวิดีโอ",
+  "@settingsPageVideoSavePathSettingHint": {
+    "description": "คำแนะนำการตั้งค่าเส้นทางบันทึกวิดีโอ",
+    "type": "text"
+  },
+  "textFormFieldRequiredError": "จำเป็นต้องกรอกข้อมูล",
+  "@textFormFieldRequiredError": {
+    "description": "ข้อความแสดงข้อผิดพลาดเมื่อฟิลด์จำเป็นต้องกรอก",
+    "type": "text"
+  },
+  "textFormFieldInvalidError": "ข้อมูลไม่ถูกต้อง",
+  "@textFormFieldInvalidError": {
+    "description": "ข้อความแสดงข้อผิดพลาดเมื่อข้อมูลไม่ถูกต้อง",
+    "type": "text"
+  },
+  "editText": "แก้ไข",
+  "@editText": {
+    "description": "ข้อความแก้ไข",
+    "type": "text"
+  },
+  "saveText": "บันทึก",
+  "@saveText": {
+    "description": "ข้อความบันทึกข้อมูล",
+    "type": "text"
+  },
+  "errorText": "ข้อผิดพลาด",
+  "@errorText": {
+    "description": "ข้อความข้อผิดพลาด",
+    "type": "text"
+  },
+  "acceptText": "ยอมรับ",
+  "@acceptText": {
+    "description": "ข้อความยอมรับ",
+    "type": "text"
+  },
+  "cancelText": "ยกเลิก",
+  "@cancelText": {
+    "description": "ข้อความยกเลิก",
+    "type": "text"
+  },
+  "connectText": "เชื่อมต่อ",
+  "@connectText": {
+    "description": "ข้อความเชื่อมต่อ",
+    "type": "text"
+  },
+  "connectedText": "เชื่อมต่อแล้ว",
+  "@connectedText": {
+    "description": "ข้อความสำหรับสถานะเชื่อมต่อแล้ว",
+    "type": "text"
+  },
+  "notConnectedText": "ไม่ได้เชื่อมต่อ",
+  "@notConnectedText": {
+    "description": "ข้อความสำหรับสถานะไม่ได้เชื่อมต่อ",
+    "type": "text"
+  },
+  "disconnectText": "ตัดการเชื่อมต่อ",
+  "@disconnectText": {
+    "description": "ข้อความตัดการเชื่อมต่อ",
+    "type": "text"
+  },
+  "disconnectedText": "ตัดการเชื่อมต่อแล้ว",
+  "@disconnectedText": {
+    "description": "ข้อความสำหรับสถานะตัดการเชื่อมต่อแล้ว",
+    "type": "text"
+  },
+  "waitingText": "กรุณารอสักครู่",
+  "@waitingText": {
+    "description": "ข้อความสำหรับสถานะกำลังรอ",
+    "type": "text"
+  },
+  "unknownError": "ข้อผิดพลาดที่ไม่รู้จัก",
+  "@unknownError": {
+    "description": "ข้อความสำหรับข้อผิดพลาดที่ไม่รู้จัก",
+    "type": "text"
+  },
+  "timeoutError": "หมดเวลาเชื่อมต่อ",
+  "@timeoutError": {
+    "description": "ข้อความสำหรับข้อผิดพลาดหมดเวลา",
+    "type": "text"
+  },
+  "unsupportedPlatformError": "แพลตฟอร์มไม่รองรับ",
+  "@unsupportedPlatformError": {
+    "description": "ข้อความสำหรับข้อผิดพลาดแพลตฟอร์มไม่รองรับ",
+    "type": "text"
+  },
+  "requestError": "ข้อผิดพลาดในการร้องขอ",
+  "@requestError": {
+    "description": "ข้อความสำหรับข้อผิดพลาดในการร้องขอ",
     "type": "text"
   }
 }

@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
+import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 
 class Setting<Value> extends Equatable {
   final String key;
@@ -92,6 +94,9 @@ class SettingWithOptions<Value> extends Setting<Value> {
 
 class SettingsState extends Equatable {
   final bool isInitialized;
+  final bool hasError;
+  final ErrorBase? error;
+  final StackTrace? stackTrace;
   final SettingWithOptions<ThemeMode> theme;
   final SettingWithOptions<Locale?> language;
   final Setting<String> host;
@@ -101,6 +106,9 @@ class SettingsState extends Equatable {
 
   const SettingsState({
     this.isInitialized = false,
+    this.hasError = false,
+    this.error,
+    this.stackTrace,
     required this.theme,
     required this.language,
     required this.host,
@@ -111,6 +119,9 @@ class SettingsState extends Equatable {
 
   SettingsState copyWith({
     bool? isInitialized,
+    bool? hasError,
+    ErrorBase? error,
+    StackTrace? stackTrace,
     SettingWithOptions<ThemeMode>? theme,
     SettingWithOptions<Locale?>? language,
     Setting<String>? host,
@@ -120,6 +131,32 @@ class SettingsState extends Equatable {
   }) {
     return SettingsState(
       isInitialized: isInitialized ?? this.isInitialized,
+      hasError: hasError ?? this.hasError,
+      error: error ?? this.error,
+      stackTrace: stackTrace ?? this.stackTrace,
+      theme: theme ?? this.theme,
+      language: language ?? this.language,
+      host: host ?? this.host,
+      port: port ?? this.port,
+      imageSavePath: imageSavePath ?? this.imageSavePath,
+      videoSavePath: videoSavePath ?? this.videoSavePath,
+    );
+  }
+
+  SettingsState copyWithNoError({
+    bool? isInitialized,
+    SettingWithOptions<ThemeMode>? theme,
+    SettingWithOptions<Locale?>? language,
+    Setting<String>? host,
+    Setting<int>? port,
+    Setting<String>? imageSavePath,
+    Setting<String>? videoSavePath,
+  }) {
+    return SettingsState(
+      isInitialized: isInitialized ?? this.isInitialized,
+      hasError: false,
+      error: null,
+      stackTrace: null,
       theme: theme ?? this.theme,
       language: language ?? this.language,
       host: host ?? this.host,
@@ -130,14 +167,27 @@ class SettingsState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [isInitialized, theme, language, host, port, imageSavePath, videoSavePath];
+  List<Object?> get props => [
+        isInitialized,
+        hasError,
+        error,
+        stackTrace,
+        theme,
+        language,
+        host,
+        port,
+        imageSavePath,
+        videoSavePath,
+      ];
 }
 
 class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit()
       : super(SettingsState(
           isInitialized: false,
+          hasError: false,
+          error: null,
+          stackTrace: null,
           theme: SettingWithOptions<ThemeMode>(
             key: SettingsRepo().theme.key,
             value:
@@ -186,7 +236,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     final prevState = state;
 
     try {
-      state = state.copyWith(
+      state = state.copyWithNoError(
         isInitialized: true,
         theme: state.theme.copyWith(
           value: SettingsRepo().theme.options[await SettingsRepo().theme.value]!,
@@ -209,7 +259,17 @@ class SettingsCubit extends Cubit<SettingsState> {
       );
     } catch (e, s) {
       log(e.toString(), stackTrace: s);
-      state = prevState;
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
     }
   }
 
@@ -220,14 +280,24 @@ class SettingsCubit extends Cubit<SettingsState> {
       await SettingsRepo().theme.setValue(
             state.theme.options[value]!,
           );
-      state = state.copyWith(
+      state = state.copyWithNoError(
         theme: state.theme.copyWith(
           value: value,
         ),
       );
     } catch (e, s) {
       log(e.toString(), stackTrace: s);
-      state = prevState;
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
     }
   }
 
@@ -239,14 +309,116 @@ class SettingsCubit extends Cubit<SettingsState> {
             state.language.options[value]!,
           );
 
-      state = state.copyWith(
+      state = state.copyWithNoError(
         language: state.language.forceCopyWith(
           value: value,
         ),
       );
     } catch (e, s) {
       log(e.toString(), stackTrace: s);
-      state = prevState;
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
+    }
+  }
+
+  Future<void> setHost(String value) async {
+    final prevState = state;
+
+    try {
+      await SettingsRepo().host.setValue(value);
+      state = state.copyWithNoError(
+        host: state.host.copyWith(
+          value: value,
+        ),
+      );
+    } catch (e, s) {
+      log(e.toString(), stackTrace: s);
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
+    }
+  }
+
+  Future<void> setPort(int value) async {
+    final prevState = state;
+
+    try {
+      await SettingsRepo().port.setValue(value.toString());
+      state = state.copyWithNoError(
+        port: state.port.copyWith(
+          value: value,
+        ),
+      );
+    } catch (e, s) {
+      log(e.toString(), stackTrace: s);
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
+    }
+  }
+
+  Future<void> setImageSavePath(String value) async {
+    final prevState = state;
+
+    try {
+      await SettingsRepo().imageSavePath.setValue(value);
+      state = state.copyWithNoError(
+        imageSavePath: state.imageSavePath.copyWith(
+          value: value,
+        ),
+      );
+    } catch (e, s) {
+      log(e.toString(), stackTrace: s);
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
+    }
+  }
+
+  Future<void> setVideoSavePath(String value) async {
+    final prevState = state;
+
+    try {
+      await SettingsRepo().videoSavePath.setValue(value);
+      state = state.copyWithNoError(
+        videoSavePath: state.videoSavePath.copyWith(
+          value: value,
+        ),
+      );
+    } catch (e, s) {
+      log(e.toString(), stackTrace: s);
+      state = prevState.copyWith(
+        hasError: true,
+        error: UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+        stackTrace: s,
+      );
     }
   }
 }

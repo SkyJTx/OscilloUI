@@ -1,30 +1,20 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ValueChangeNotifer<T extends Object?> extends Cubit<T> {
-  ValueChangeNotifer(super.state);
-
-  final List<FutureOr<void> Function(T value)> _listeners = [];
-
-  T get value => state;
-
-  set value(T value) {
-    emit(value);
-    for (final listener in _listeners) {
-      listener(value);
-    }
+class ValueChangeNotifer<T extends Object?> extends ValueNotifier<T> {
+  ValueChangeNotifer(super.value) {
+    stringController = TextEditingController(text: value.toString());
+    addListener(() {
+      stringController.text = value.toString();
+    });
   }
 
-  void addListener(FutureOr<void> Function(T value) listener) {
-    _listeners.add(listener);
+  @override
+  void dispose() {
+    stringController.dispose();
+    super.dispose();
   }
 
-  void removeListener(FutureOr<void> Function(T value) listener) {
-    _listeners.remove(listener);
-  }
+  late final TextEditingController stringController;
 }
 
 class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
@@ -32,14 +22,17 @@ class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
     BuildContext context,
     T value,
     void Function(T value) setValue,
+    Widget? child,
   ) builder;
 
   final ValueChangeNotifer<T> valueChangeNotifier;
+  final Widget? child;
 
   const ValueChangeNotifierBuilder({
     super.key,
     required this.builder,
     required this.valueChangeNotifier,
+    this.child,
   });
 
   static ValueChangeNotifierBuilder<Q> easy<Q extends Object?>({
@@ -47,26 +40,34 @@ class ValueChangeNotifierBuilder<T extends Object?> extends StatelessWidget {
       BuildContext context,
       Q value,
       void Function(Q value) setValue,
+      Widget? child,
     ) builder,
     required Q initialValue,
+    void Function(ValueChangeNotifer<Q> valueChangeNotifier)? onInit,
   }) {
-    return ValueChangeNotifierBuilder(
+    final valueChangeNotifier = ValueChangeNotifer<Q>(initialValue);
+    final widget = ValueChangeNotifierBuilder(
       builder: builder,
-      valueChangeNotifier: ValueChangeNotifer<Q>(initialValue),
+      valueChangeNotifier: valueChangeNotifier,
     );
+    if (onInit != null) {
+      onInit(valueChangeNotifier);
+    }
+    return widget;
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ValueChangeNotifer<T>, T>(
-      bloc: valueChangeNotifier,
-      builder: (context, value) {
+    return ValueListenableBuilder(
+      valueListenable: valueChangeNotifier,
+      builder: (context, value, child) {
         return builder(
           context,
           value,
           (value) {
             valueChangeNotifier.value = value;
           },
+          child,
         );
       },
     );

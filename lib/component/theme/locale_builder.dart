@@ -5,12 +5,12 @@ import 'package:oscillo_ui/page/settings_page/settings_cubit.dart';
 
 class LocaleBuilder extends StatefulWidget {
   final Widget Function(BuildContext context, Locale? locale) builder;
-  final SettingsCubit settingsCubit;
+  final SettingsCubit? settingsCubit;
 
   const LocaleBuilder({
     super.key,
     required this.builder,
-    required this.settingsCubit,
+    this.settingsCubit,
   });
 
   @override
