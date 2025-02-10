@@ -1,13 +1,10 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oscillo_ui/component/loading_ring.dart';
+import 'package:oscillo_ui/component/value_change_notifier/value_change_notifier.dart';
 import 'package:oscillo_ui/page/main_page/oscilloscope_cubit.dart';
-import 'package:oscillo_ui/repo/image_and_video/image_processing_repo.dart';
-import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_repo.dart';
-import 'package:oscillo_ui/repo/settings/settings_repo.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MainPage extends StatefulWidget {
@@ -21,9 +18,38 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   final textController = TextEditingController();
+  final imageSliderController = ValueChangeNotifer(0.0);
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<OscilloscopeCubit>().fetchConnections().then((_) {
+      log('MainPageState fetchConnections');
+    });
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    imageSliderController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OscilloscopeCubit, OscilloscopeState>(
+    return BlocConsumer<OscilloscopeCubit, OscilloscopeState>(
+      listener: (context, state) {
+        if (state.isInitialized && state.isConnected) {
+          if (imageSliderController.value == state.data!.videoFrames.length - 2) {
+            imageSliderController.value = state.data!.videoFrames.length - 1;
+            return;
+          }
+          imageSliderController.value = (imageSliderController.value).clamp(
+            0,
+            state.data!.videoFrames.length.toDouble() - 1,
+          );
+        }
+      },
       builder: (context, state) {
         if (!state.isInitialized) {
           return LoadingRing();
@@ -49,10 +75,47 @@ class MainPageState extends State<MainPage> {
           );
         }
 
+        final data = state.data!;
+
         return Container(
           padding: EdgeInsets.all(8),
           alignment: Alignment.center,
-          child: Text('Connected'),
+          child: Column(
+            spacing: 4,
+            children: [
+              data.videoFrames.isNotEmpty
+                  ? Expanded(
+                      child: Image.memory(
+                        data.videoFrames[imageSliderController.value.toInt()].image,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(child: Text(AppLocalizations.of(context).errorText));
+                        },
+                      ),
+                    )
+                  : Text(AppLocalizations.of(context).noDataText),
+              ValueChangeNotifierBuilder(
+                valueChangeNotifier: imageSliderController,
+                builder: (context, value, setValue, child) {
+                  return Slider(
+                    value: value,
+                    onChanged: setValue,
+                    min: 0,
+                    divisions: data.videoFrames.length,
+                    max: data.videoFrames.length.toDouble() - 1,
+                  );
+                },
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Button(
+                  child: Text('Capture'),
+                  onPressed: () {
+                    OscilloscopeCubit().capture();
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

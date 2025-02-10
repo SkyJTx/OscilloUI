@@ -4,8 +4,8 @@ import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oscillo_ui/component/errors/error_base.dart';
+import 'package:oscillo_ui/repo/settings/entries/locale_entry.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
-import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 
 class Setting<Value> extends Equatable {
   final String key;
@@ -98,7 +98,7 @@ class SettingsState extends Equatable {
   final ErrorBase? error;
   final StackTrace? stackTrace;
   final SettingWithOptions<ThemeMode> theme;
-  final SettingWithOptions<Locale?> language;
+  final SettingWithOptions<LocaleData?> language;
   final Setting<String> host;
   final Setting<int> port;
   final Setting<String> imageSavePath;
@@ -123,7 +123,7 @@ class SettingsState extends Equatable {
     ErrorBase? error,
     StackTrace? stackTrace,
     SettingWithOptions<ThemeMode>? theme,
-    SettingWithOptions<Locale?>? language,
+    SettingWithOptions<LocaleData?>? language,
     Setting<String>? host,
     Setting<int>? port,
     Setting<String>? imageSavePath,
@@ -146,7 +146,7 @@ class SettingsState extends Equatable {
   SettingsState copyWithNoError({
     bool? isInitialized,
     SettingWithOptions<ThemeMode>? theme,
-    SettingWithOptions<Locale?>? language,
+    SettingWithOptions<LocaleData?>? language,
     Setting<String>? host,
     Setting<int>? port,
     Setting<String>? imageSavePath,
@@ -198,10 +198,10 @@ class SettingsCubit extends Cubit<SettingsState> {
                 value: key,
             },
           ),
-          language: SettingWithOptions<Locale?>(
+          language: SettingWithOptions<LocaleData?>(
             key: SettingsRepo().locale.key,
             value:
-                SettingsRepo().locale.options[SettingsRepo().locale.defaultValue] ?? Locale('en'),
+                SettingsRepo().locale.options[SettingsRepo().locale.defaultValue],
             enabled: SettingsRepo().locale.defaultEnabled,
             options: {
               for (var MapEntry(key: key, value: value) in SettingsRepo().locale.options.entries)
@@ -301,7 +301,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  Future<void> setLanguage(Locale? value) async {
+  Future<void> setLanguage(LocaleData? value) async {
     final prevState = state;
 
     try {

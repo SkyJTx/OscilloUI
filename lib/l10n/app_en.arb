@@ -1,6 +1,11 @@
 {
   "@@locale": "en",
   "@@author": "SkyJT",
+  "language": "English (US)",
+  "@language": {
+    "description": "The language of the app",
+    "type": "text"
+  },
   "title": "OscilloUI",
   "@title": {
     "description": "The title of the app",
@@ -74,21 +79,6 @@
   "settingsPageLanguageSettingSubtitle": "Change the language of the app",
   "@settingsPageLanguageSettingSubtitle": {
     "description": "The subtitle of the language setting",
-    "type": "text"
-  },
-  "settingsPageLanguageSettingOptionSystem": "System (English)",
-  "@settingsPageLanguageSettingOptionSystem": {
-    "description": "The system language option",
-    "type": "text"
-  },
-  "settingsPageLanguageSettingOptionEnglish": "English",
-  "@settingsPageLanguageSettingOptionEnglish": {
-    "description": "The English language option",
-    "type": "text"
-  },
-  "settingsPageLanguageSettingOptionThai": "ภาษาไทย",
-  "@settingsPageLanguageSettingOptionThai": {
-    "description": "The Thai language option",
     "type": "text"
   },
   "settingsPageConnectionSettingTitle": "Connection",
@@ -181,6 +171,11 @@
     "description": "The error message for invalid text form field",
     "type": "text"
   },
+  "defaultText": "Default",
+  "@defaultText": {
+    "description": "The default text",
+    "type": "text"
+  },
   "editText": "Edit",
   "@editText": {
     "description": "The edit text",
@@ -204,6 +199,16 @@
   "cancelText": "Cancel",
   "@cancelText": {
     "description": "A cancel text",
+    "type": "text"
+  },
+  "emptyText": "Empty",
+  "@emptyText": {
+    "description": "An empty text",
+    "type": "text"
+  },
+  "noDataText": "No data",
+  "@noDataText": {
+    "description": "A no data text",
     "type": "text"
   },
   "connectText": "Connect",
@@ -254,6 +259,16 @@
   "requestError": "Request error",
   "@requestError": {
     "description": "A request error message",
+    "type": "text"
+  },
+  "permissionDeniedError": "Permission denied",
+  "@permissionDeniedError": {
+    "description": "A permission denied error message",
+    "type": "text"
+  },
+  "fatalErrorText": "The program has encountered a problem and needs to close. We are sorry for the inconvenience. Please report this error to the developer. Thank you!",
+  "@fatalErrorText": {
+    "description": "A fatal error text",
     "type": "text"
   }
 }

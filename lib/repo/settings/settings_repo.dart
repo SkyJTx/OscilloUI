@@ -18,7 +18,12 @@ class SettingsRepo {
 
   Future<void> init() async {
     await StoreRepo.create();
-    await Future.wait(instance.entries.map((entry) => entry.init()));
+    await Future.wait(instance.entries.map(
+      (entry) async {
+        final rebaseEntry = await entry.rebase();
+        return rebaseEntry.init();
+      },
+    ));
   }
 
   ThemeEntry get theme => ThemeEntry();
@@ -34,11 +39,11 @@ class SettingsRepo {
   VideoSavePath get videoSavePath => VideoSavePath();
 
   List<BaseEntry> get entries => [
-        ThemeEntry(),
-        LocaleEntry(),
-        HostEntry(),
-        PortEntry(),
-        ImageSavePath(),
-        VideoSavePath(),
+        theme,
+        locale,
+        host,
+        port,
+        imageSavePath,
+        videoSavePath,
       ];
 }

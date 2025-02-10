@@ -8,15 +8,15 @@ plugins {
 android {
     namespace = "com.skyjt.oscillo_ui"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // Temporary fix and waiting for Flutter to update the NDK version.
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -57,5 +57,5 @@ dependencies {
     // e.g. check https://github.com/objectbox/objectbox-dart/releases
     // Warning: when ObjectBox for Dart updates check if <version>
     // needs to be updated.
-    debugImplementation("io.objectbox:objectbox-android-objectbrowser:<version>")
+    debugImplementation("io.objectbox:objectbox-android-objectbrowser:4.1.0")
 }

@@ -1,14 +1,11 @@
-import 'dart:developer';
-
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:oscillo_ui/component/value_change_notifier/value_change_notifier.dart';
-import 'package:oscillo_ui/constant/oscilloscope.dart';
 import 'package:oscillo_ui/page/gallery_page/gallery_page.dart';
 import 'package:oscillo_ui/page/main_page/main_page.dart';
+import 'package:oscillo_ui/page/main_page/oscilloscope_cubit.dart';
 import 'package:oscillo_ui/page/settings_page/settings_page.dart';
-import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_repo.dart';
-import 'package:oscillo_ui/repo/settings/settings_repo.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -29,6 +26,18 @@ class HomeState extends State<Home> {
         return NavigationView(
           appBar: NavigationAppBar(
             title: Text(locale.title),
+            actions: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Button(
+                  child: Icon(FluentIcons.reset),
+                  onPressed: () {
+                    context.read<OscilloscopeCubit>().reset();
+                  },
+                ),
+              ],
+            ),
           ),
           pane: NavigationPane(
             selected: value,

@@ -4,11 +4,13 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/component/app_builder/locale_builder.dart';
 import 'package:oscillo_ui/component/dialogs/error_dialog.dart';
 import 'package:oscillo_ui/component/dialogs/loading_dialog.dart';
 import 'package:oscillo_ui/page/settings_page/capture_path_dialog.dart';
 import 'package:oscillo_ui/page/settings_page/connection_dialog.dart';
 import 'package:oscillo_ui/page/settings_page/settings_cubit.dart';
+import 'package:oscillo_ui/repo/settings/entries/locale_entry.dart';
 import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 import 'package:sizer/sizer.dart';
 
@@ -393,38 +395,132 @@ class SettingsPageState extends State<SettingsPage> {
                     themeExpanderState.currentState?.isExpanded = false;
                   }
                 },
-                content: Builder(
-                  builder: (context) {
-                    ({String title}) languageCreator(Locale? inputLocale) => switch (inputLocale) {
-                          null => (title: locale.settingsPageLanguageSettingOptionSystem,),
-                          Locale(languageCode: 'en') => (
-                              title: locale.settingsPageLanguageSettingOptionEnglish,
-                            ),
-                          Locale(languageCode: 'th') => (
-                              title: locale.settingsPageLanguageSettingOptionThai,
-                            ),
-                          _ => throw Exception('Unknown locale: $inputLocale'),
-                        };
+                content: LocaleBuilder(
+                  builder: (
+                    context,
+                    locale,
+                    systemLocale,
+                    supportLocales,
+                    localizationsDelegate,
+                    localization,
+                  ) {
+                    LocaleData? systemLocaleData;
+                    int maxMatch = 0;
+                    for (final e in state.language.options.keys) {
+                      if (e == null) continue;
+                      int match = [
+                        e.locale.languageCode == systemLocale.languageCode,
+                        if (e.locale.scriptCode != null || systemLocale.scriptCode != null)
+                          e.locale.scriptCode == systemLocale.scriptCode,
+                        if (e.locale.countryCode != null || systemLocale.countryCode != null)
+                          e.locale.countryCode == systemLocale.countryCode,
+                      ].where((e) => e).length;
+                      if (match > maxMatch) {
+                        maxMatch = match;
+                        systemLocaleData = e;
+                      }
+                    }
+                    final languageList = state.language.options.keys.toList();
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final e in state.language.options.keys) ...[
-                          SizedBox(height: 3),
-                          RadioButton(
-                            checked: state.language.value == e,
-                            onChanged: (checked) {
-                              if (checked) {
-                                settingsCubit.setLanguage(e);
-                              }
-                            },
-                            content: Text(languageCreator(e).title),
-                          ),
-                          SizedBox(height: 3),
-                        ],
-                      ],
+                      children: List.generate(
+                        languageList.length,
+                        (index) {
+                          final language = languageList[index];
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 3),
+                            child: RadioButton(
+                              checked: state.language.value == language,
+                              onChanged: (checked) {
+                                if (checked) {
+                                  settingsCubit.setLanguage(language);
+                                }
+                              },
+                              content: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: language != null
+                                    ? [
+                                        Text(language.language),
+                                      ]
+                                    : [
+                                        Text(
+                                          systemLocaleData?.defaultText ??
+                                              AppLocalizations.of(context).defaultText,
+                                        ),
+                                        if (systemLocaleData != null)
+                                          Text(
+                                            systemLocaleData.language,
+                                            style: theme.typography.caption,
+                                          ),
+                                      ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
+                // content: Builder(
+                //   builder: (context) {
+                //     return Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         for (final e in state.language.options.keys)
+                //           Padding(
+                //             padding: EdgeInsets.symmetric(vertical: 3),
+                //             child: RadioButton(
+                //               checked: state.language.value == e,
+                //               onChanged: (checked) {
+                //                 if (checked) {
+                //                   settingsCubit.setLanguage(e);
+                //                 }
+                //               },
+                //               content: Builder(
+                //                 builder: (context) {
+                //                   return Text(
+                //                     e?.language ?? locale.systemLanguage,
+                //                   );
+                //                 }
+                //               ),
+                //             ),
+                //           ),
+                //       ],
+                //     );
+                //   },
+                // ),
+                // content: Builder(
+                //   builder: (context) {
+                //     ({String title}) languageCreator(Locale? inputLocale) => switch (inputLocale) {
+                //           null => (title: locale.settingsPageLanguageSettingOptionSystem,),
+                //           Locale(languageCode: 'en') => (
+                //               title: locale.settingsPageLanguageSettingOptionEnglish,
+                //             ),
+                //           Locale(languageCode: 'th') => (
+                //               title: locale.settingsPageLanguageSettingOptionThai,
+                //             ),
+                //           _ => throw Exception('Unknown locale: $inputLocale'),
+                //         };
+                //     return Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         for (final e in state.language.options.keys) ...[
+                //           SizedBox(height: 3),
+                //           RadioButton(
+                //             checked: state.language.value == e,
+                //             onChanged: (checked) {
+                //               if (checked) {
+                //                 settingsCubit.setLanguage(e);
+                //               }
+                //             },
+                //             content: Text(languageCreator(e).title),
+                //           ),
+                //           SizedBox(height: 3),
+                //         ],
+                //       ],
+                //     );
+                //   },
+                // ),
               ),
               if (kDebugMode) ...[
                 SizedBox(height: 8),

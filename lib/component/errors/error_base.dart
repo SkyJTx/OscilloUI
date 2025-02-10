@@ -5,13 +5,15 @@ import 'package:oscillo_ui/component/dialogs/error_dialog.dart';
 part 'errors.dart';
 
 abstract class ErrorBase {
-  final String code;
-  final String Function(BuildContext context) messageConstructor;
-  final Object? error;
-  final StackTrace? stackTrace;
+  String code;
+  String text;
+  String Function(BuildContext context) messageConstructor;
+  Object? error;
+  StackTrace? stackTrace;
 
   ErrorBase({
     required this.code,
+    required this.text,
     required this.messageConstructor,
     this.error,
     this.stackTrace,
@@ -20,7 +22,12 @@ abstract class ErrorBase {
   Future<void> raise(BuildContext context) {
     return ErrorDialog.show(
       context,
-      error: messageConstructor(context),
+      error: '${messageConstructor(context)}: $code',
     );
+  }
+
+  @override
+  String toString() {
+    return 'Error Status Code: $code - $text';
   }
 }

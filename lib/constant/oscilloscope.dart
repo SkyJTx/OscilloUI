@@ -1,6 +1,5 @@
 // ignore_for_file: constant_identifier_names
 
-import 'dart:developer';
 import 'dart:typed_data';
 
 typedef ImageByteWithTimestamp = ({
@@ -15,7 +14,7 @@ enum Data {
   triggerLevel,
   ;
 
-  String get string {
+  String get command {
     switch (this) {
       case Data.timePerDiv:
         return 'TIME';
@@ -33,7 +32,7 @@ enum Data {
       case Data.timePerDiv:
         return double.parse(value) as T;
       case Data.channel:
-        return Channel.values.firstWhere((e) => e.toString() == value) as T;
+        return Channel.values.firstWhere((e) => e.string == value) as T;
       case Data.triggerEdgeType:
         return EdgeType.values.firstWhere((e) => e.string == value) as T;
       case Data.triggerLevel:
@@ -95,7 +94,6 @@ enum ChannelEnum {
   }
 
   T deserialize<T>(String value) {
-    log('ChannelEnum: $this, value: $value == ${Coupling.DC.string}');
     switch (this) {
       case ChannelEnum.state:
         return value == 'ON' ? true as T : false as T;
@@ -106,7 +104,9 @@ enum ChannelEnum {
       case ChannelEnum.offset:
         return double.parse(value) as T;
       case ChannelEnum.coupling:
-        return Coupling.values.firstWhere((e) => e.toString() == value) as T;
+        return Coupling.values.firstWhere((e) {
+          return e.string == value;
+        }) as T;
     }
   }
 }

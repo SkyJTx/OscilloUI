@@ -18,6 +18,7 @@ class LoadingDialog extends StatelessWidget {
   static Future<void> show(BuildContext context) async {
     await showDialog(
       context: context,
+      transitionBuilder: _transitionBuilder,
       builder: (context) => LoadingDialog(),
     );
   }

@@ -1,6 +1,11 @@
 {
   "@@locale": "th",
   "@@author": "SkyJT",
+  "language": "ไทย",
+  "@language": {
+    "description": "ภาษาของแอป",
+    "type": "text"
+  },
   "title": "ออสซิโลยูไอ",
   "@title": {
     "description": "ชื่อแอป",
@@ -74,21 +79,6 @@
   "settingsPageLanguageSettingSubtitle": "เลือกภาษาที่คุณต้องการ",
   "@settingsPageLanguageSettingSubtitle": {
     "description": "คำอธิบายการตั้งค่าภาษา",
-    "type": "text"
-  },
-  "settingsPageLanguageSettingOptionSystem": "ระบบ (ภาษาไทย)",
-  "@settingsPageLanguageSettingOptionSystem": {
-    "description": "ตัวเลือกภาษาระบบ",
-    "type": "text"
-  },
-  "settingsPageLanguageSettingOptionEnglish": "English",
-  "@settingsPageLanguageSettingOptionEnglish": {
-    "description": "ตัวเลือกภาษาอังกฤษ",
-    "type": "text"
-  },
-  "settingsPageLanguageSettingOptionThai": "ภาษาไทย",
-  "@settingsPageLanguageSettingOptionThai": {
-    "description": "ตัวเลือกภาษาไทย",
     "type": "text"
   },
   "settingsPageHostSettingTitle": "โฮสต์เนม",
@@ -181,6 +171,11 @@
     "description": "ข้อความแสดงข้อผิดพลาดเมื่อข้อมูลไม่ถูกต้อง",
     "type": "text"
   },
+  "defaultText": "ค่าเริ่มต้น",
+  "@defaultText": {
+    "description": "ข้อความค่าเริ่มต้น",
+    "type": "text"
+  },
   "editText": "แก้ไข",
   "@editText": {
     "description": "ข้อความแก้ไข",
@@ -204,6 +199,16 @@
   "cancelText": "ยกเลิก",
   "@cancelText": {
     "description": "ข้อความยกเลิก",
+    "type": "text"
+  },
+  "emptyText": "ว่างเปล่า",
+  "@emptyText": {
+    "description": "ข้อความว่างเปล่า",
+    "type": "text"
+  },
+  "noDataText": "ไม่มีข้อมูล",
+  "@noDataText": {
+    "description": "ข้อความไม่มีข้อมูล",
     "type": "text"
   },
   "connectText": "เชื่อมต่อ",
@@ -254,6 +259,16 @@
   "requestError": "ข้อผิดพลาดในการร้องขอ",
   "@requestError": {
     "description": "ข้อความสำหรับข้อผิดพลาดในการร้องขอ",
+    "type": "text"
+  },
+  "permissionDeniedError": "การเข้าถึงถูกปฏิเสธ",
+  "@permissionDeniedError": {
+    "description": "ข้อความสำหรับข้อผิดพลาดการเข้าถึงถูกปฏิเสธ",
+    "type": "text"
+  },
+  "fatalErrorText": "โปรแกรมพบปัญหาและจำเป็นต้องปิด เราขออภัยในความไม่สะดวก กรุณารายงานข้อผิดพลาดนี้ให้กับนักพัฒนา ขอบคุณ!",
+  "@fatalErrorText": {
+    "description": "ข้อความสำหรับข้อผิดพลาดร้ายแรง",
     "type": "text"
   }
 }

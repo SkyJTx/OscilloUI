@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/component/task.dart';
 import 'package:oscillo_ui/constant/oscilloscope.dart';
 import 'package:oscillo_ui/data_models/oscilloscope_data/channel_data.dart';
@@ -11,6 +11,7 @@ import 'package:oscillo_ui/data_models/oscilloscope_data/trigger_data.dart';
 
 class OscilloscopeApiProvider {
   Socket? _socket;
+  Stream? _broadcastStream;
   Completer<bool> _connectedCompleter = Completer<bool>();
   final String ip;
   final int port;
@@ -58,17 +59,28 @@ class OscilloscopeApiProvider {
     return _socket!;
   }
 
-  Future<void> connect() async {
-    if (isConnected) return;
+  Stream get broadcastStream {
+    _broadcastStream ??= socket.asBroadcastStream(
+      onCancel: (subscription) {
+        _broadcastStream = null;
+      },
+    );
+    return _broadcastStream!;
+  }
 
-    _socket = await Socket.connect(ip, port, timeout: 60.seconds);
+  Future<void> connect({
+    Duration timeout = const Duration(seconds: 15),
+  }) async {
+    if (isConnected) return;
+    
+    _socket = await Socket.connect(ip, port, timeout: timeout);
 
     _connectedCompleter.complete(true);
   }
 
   Future<void> disconnect() async {
     if (!isConnected) return;
-    await _socket!.close();
+      await _socket!.close();
     _socket = null;
 
     _connectedCompleter = Completer<bool>();
@@ -79,8 +91,10 @@ class OscilloscopeApiProvider {
     bool invert = false,
     CaptureFormat format = CaptureFormat.PNG,
   }) async {
-    final result =
-        await run(':DISP:DATA? ${color.stringSwitch},${invert.stringSwitch},${format.string}');
+    final result = await run(
+      ':DISP:DATA? ${color.stringSwitch},${invert.stringSwitch},${format.string}',
+      removeNewLine: false,
+    );
     return result.sublist(11);
   }
 
@@ -205,29 +219,39 @@ class OscilloscopeApiProvider {
   Future<Uint8List> run(
     String command, {
     bool isWriteMode = true,
-    Duration interWaitingTime = const Duration(milliseconds: 500),
+    bool removeNewLine = true,
+    Duration interWaitingTime = const Duration(milliseconds: 200),
+    Duration timeout = const Duration(seconds: 5),
   }) async {
     final completer = Completer<Uint8List>();
-    if (!isConnected) throw Exception('Not connected to oscilloscope');
+    final timeoutTimer = Timer(timeout, () {
+      completer.completeError(TimeoutError());
+    });
+    if (!isConnected) throw RequestError(error: 'Not connected to oscilloscope');
 
     socket.writeln(command);
 
     BytesBuilder respData = BytesBuilder();
     Timer? timer;
-    final sub = socket.listen((data) {
+    final sub = broadcastStream.listen((data) {
       respData.add(data);
       timer?.cancel();
       timer = Timer(interWaitingTime, () {
-        final respBytes = respData.toBytes();
-        final stringBytes = String.fromCharCodes(respBytes);
-        final newLineFilteredStringBytes = stringBytes.replaceAll('\n', '');
-        final stringBytesCodeUnits = newLineFilteredStringBytes.codeUnits;
-        final data = Uint8List.fromList(stringBytesCodeUnits);
-        completer.complete(data);
+        if (removeNewLine) {
+          final respBytes = respData.toBytes();
+          final stringBytes = String.fromCharCodes(respBytes);
+          final newLineFilteredStringBytes = stringBytes.replaceAll('\n', '');
+          final stringBytesCodeUnits = newLineFilteredStringBytes.codeUnits;
+          final data = Uint8List.fromList(stringBytesCodeUnits);
+          completer.complete(data);
+        } else {
+          completer.complete(respData.toBytes());
+        }
       });
     });
 
     return await completer.future.whenComplete(() async {
+      timeoutTimer.cancel();
       timer?.cancel();
       await sub.cancel();
       if (isWriteMode) {

@@ -3,9 +3,8 @@ import 'dart:developer';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:oscillo_ui/component/theme/locale_builder.dart';
-import 'package:oscillo_ui/component/theme/theme_builder.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/component/app_builder/locale_builder.dart';
+import 'package:oscillo_ui/component/app_builder/theme_builder.dart';
 import 'package:oscillo_ui/dependency_injector.dart';
 import 'package:oscillo_ui/page/home.dart';
 import 'package:oscillo_ui/page/main_page/oscilloscope_cubit.dart';
@@ -21,26 +20,26 @@ void main() async {
   await DependencyInjector().init();
   runApp(MultiRepositoryProvider(
     providers: [
-      RepositoryProvider(
-        create: (context) => OscilloscopeRepo(),
+      RepositoryProvider.value(
+        value: OscilloscopeRepo(),
       ),
-      RepositoryProvider(
-        create: (context) => StoreRepo(),
+      RepositoryProvider.value(
+        value: StoreRepo(),
       ),
-      RepositoryProvider(
-        create: (context) => SettingsRepo(),
+      RepositoryProvider.value(
+        value: SettingsRepo(),
       ),
-      RepositoryProvider(
-        create: (context) => ConnectionsRepo(),
+      RepositoryProvider.value(
+        value: ConnectionsRepo(),
       ),
     ],
     child: MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => SettingsCubit()..init(),
+        BlocProvider.value(
+          value: SettingsCubit()..init(),
         ),
-        BlocProvider(
-          create: (context) => OscilloscopeCubit()..init(),
+        BlocProvider.value(
+          value: OscilloscopeCubit()..init(),
         ),
       ],
       child: const MainApp(),
@@ -60,23 +59,30 @@ class MainApp extends StatelessWidget {
           builder: (context, currentTheme, lightTheme, darkTheme, themeMode) {
             return LocaleBuilder(
               settingsCubit: context.read<SettingsCubit>(),
-              builder: (context, locale) {
+              builder: (
+                context,
+                locale,
+                systemLocale,
+                supportLocales,
+                localizationsDelegate,
+                localization,
+              ) {
                 return FluentApp(
                   debugShowCheckedModeBanner: false,
                   navigatorKey: UiRepo.navigatorKey,
                   onGenerateTitle: (context) {
-                    final title = AppLocalizations.of(context).title;
-                    final description = AppLocalizations.of(context).description;
+                    final title = localization(context, locale).title;
+                    final description = localization(context, locale).description;
                     return '$title - $description';
                   },
                   localizationsDelegates: [
-                    AppLocalizations.delegate,
+                    localizationsDelegate,
                     GlobalMaterialLocalizations.delegate,
                     GlobalCupertinoLocalizations.delegate,
                     GlobalWidgetsLocalizations.delegate,
                   ],
                   locale: locale,
-                  supportedLocales: AppLocalizations.supportedLocales,
+                  supportedLocales: supportLocales,
                   theme: lightTheme,
                   darkTheme: darkTheme,
                   themeMode: themeMode,
@@ -86,6 +92,11 @@ class MainApp extends StatelessWidget {
                         listener: (context, state) {
                           if (state.hasError) {
                             state.error?.raise(context);
+                            log(
+                              "SettingsCubit error: ${state.error?.error}",
+                              error: state.error?.error,
+                              stackTrace: state.error?.stackTrace,
+                            );
                           }
                         },
                       ),
@@ -93,6 +104,11 @@ class MainApp extends StatelessWidget {
                         listener: (context, state) {
                           if (state.hasError) {
                             state.error?.raise(context);
+                            log(
+                              "OscilloscopeCubit error: ${state.error?.error}",
+                              error: state.error?.error,
+                              stackTrace: state.error?.stackTrace,
+                            );
                           }
                         },
                       ),

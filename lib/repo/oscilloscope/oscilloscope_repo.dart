@@ -11,8 +11,6 @@ import 'package:oscillo_ui/constant/oscilloscope.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_api_provider.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_video_command.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 
 class OscilloscopeRepo {
 
@@ -26,11 +24,17 @@ class OscilloscopeRepo {
 
   StreamController<ImageByteWithTimestamp>? _videoStreamController;
 
+  StreamController<ErrorBase>? _errorStreamController;
+
   Stream<ImageByteWithTimestamp>? _videoStream;
+
+  Stream<ErrorBase>? _errorStream;
 
   Isolate? _videoIsolate;
 
   ReceivePort? _receivePort;
+
+  ReceivePort? _errorReceivePort;
 
   SendPort? _sendPort;
 
@@ -48,9 +52,19 @@ class OscilloscopeRepo {
     return _videoStreamController!;
   }
 
+  StreamController<ErrorBase> get errorStreamController {
+    _errorStreamController ??= StreamController<ErrorBase>.broadcast();
+    return _errorStreamController!;
+  }
+
   Stream<ImageByteWithTimestamp> get videoStream {
     _videoStream ??= videoStreamController.stream.asBroadcastStream();
     return _videoStream!;
+  }
+
+  Stream<ErrorBase> get errorStream {
+    _errorStream ??= errorStreamController.stream.asBroadcastStream();
+    return _errorStream!;
   }
 
   Isolate get videoIsolate {
@@ -65,6 +79,13 @@ class OscilloscopeRepo {
       throw Exception('Receive Port is not initialized');
     }
     return _receivePort!;
+  }
+
+  ReceivePort get errorReceivePort {
+    if (_errorReceivePort == null) {
+      throw Exception('Error Receive Port is not initialized');
+    }
+    return _errorReceivePort!;
   }
 
   SendPort get sendPort {
@@ -92,6 +113,7 @@ class OscilloscopeRepo {
     _videoStream = videoStreamController.stream.asBroadcastStream();
 
     _receivePort = ReceivePort();
+    _errorReceivePort = ReceivePort();
     receivePort.listen((message) {
       log('Received message (Main Thread) at ${DateTime.now()}');
       if (message is SendPort) {
@@ -114,11 +136,22 @@ class OscilloscopeRepo {
         log('Send start command');
       }
     });
+    errorReceivePort.listen((error) {
+      log('Received error message (Main Thread) at ${DateTime.now()}');
+      if (error is ErrorBase) {
+        errorStreamController.add(error);
+      } else {
+        errorStreamController.add(UnknownError(
+          error: error,
+        ));
+      }
+    });
 
     _videoIsolate = await Isolate.spawn<SendPort>(
       _videoIsolateEntryPoint,
       receivePort.sendPort,
       debugName: 'OscilloscopeVideoIsolate',
+      onError: errorReceivePort.sendPort,
     );
 
     _isConnected = true;
@@ -212,7 +245,6 @@ class OscilloscopeRepo {
   }
 
   Future<void> capture({String? fileName}) async {
-    
     final data = await apiProvider.capture();
     final name = fileName ?? 'capture_${DateTime.now().millisecondsSinceEpoch}';
     
@@ -221,6 +253,9 @@ class OscilloscopeRepo {
       final path = '$savePath/$name.png';
       final file = await File(path).create(recursive: true);
       await file.writeAsBytes(data);
+    } else if (Platform.isAndroid || Platform.isIOS) {
+      //TODO: Implement for mobile
+      throw UnsupportedPlatformError();
     } else {
       throw UnsupportedPlatformError();
     }

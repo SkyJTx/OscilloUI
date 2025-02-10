@@ -42,6 +42,12 @@ abstract class BaseEntry {
         'options': null,
       };
 
+  /// Construct the entry.
+  /// If not overriden, it will return itself
+  FutureOr<BaseEntry> rebase() async {
+    return this;
+  }
+
   Future<void> init() async {
     return txn(TxMode.write, (store, p) {
       final box = store.box<SettingEntity>();

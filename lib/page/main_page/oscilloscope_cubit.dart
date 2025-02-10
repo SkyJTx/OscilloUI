@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oscillo_ui/component/dialogs/loading_dialog.dart';
 import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/constant/oscilloscope.dart';
 import 'package:oscillo_ui/data_models/oscilloscope_data/oscilloscope_data.dart';
-import 'package:oscillo_ui/data_models/oscilloscope_data/trigger_data.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_repo.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
+import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 
 class OscilloscopeState extends Equatable {
   late final int id;
@@ -55,6 +55,7 @@ class OscilloscopeState extends Equatable {
     bool? isInitialized,
     bool? isConnected,
     OscilloscopeData? data,
+    List<({String hostname, int port})>? connections,
   }) {
     return OscilloscopeState(
       id: DateTime.now().millisecondsSinceEpoch,
@@ -62,7 +63,7 @@ class OscilloscopeState extends Equatable {
       isConnected: isConnected ?? this.isConnected,
       hasError: false,
       error: null,
-      connections: connections,
+      connections: connections ?? this.connections,
       data: data ?? this.data,
     );
   }
@@ -76,6 +77,23 @@ class OscilloscopeState extends Equatable {
       error: error,
       connections: connections,
       data: data,
+    );
+  }
+
+  OscilloscopeState copyWithNoError({
+    bool? isInitialized,
+    bool? isConnected,
+    OscilloscopeData? data,
+    List<({String hostname, int port})>? connections,
+  }) {
+    return OscilloscopeState(
+      id: DateTime.now().millisecondsSinceEpoch,
+      isInitialized: isInitialized ?? this.isInitialized,
+      isConnected: isConnected ?? this.isConnected,
+      hasError: false,
+      error: null,
+      connections: connections ?? this.connections,
+      data: data ?? this.data,
     );
   }
 
@@ -94,16 +112,14 @@ class OscilloscopeState extends Equatable {
 class OscilloscopeCubit extends Cubit<OscilloscopeState> {
   StreamSubscription<ImageByteWithTimestamp>? _videoSub;
 
-  OscilloscopeCubit._internal()
-      : super(
-          OscilloscopeState(
-            isInitialized: false,
-            isConnected: false,
-            hasError: false,
-          ),
-        );
+  OscilloscopeCubit._internal() : super(defaultState);
 
   static final OscilloscopeCubit _instance = OscilloscopeCubit._internal();
+  static final OscilloscopeState defaultState = OscilloscopeState(
+    isInitialized: false,
+    isConnected: false,
+    hasError: false,
+  );
 
   factory OscilloscopeCubit({
     OscilloscopeState? state,
@@ -120,9 +136,29 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
           hostname: await SettingsRepo().host.value,
           port: int.parse(await SettingsRepo().port.value),
         ),
-      ];
-      emit(saveState.copyWith(
+      ]; //! To be replaced with actual connections
+      emit(saveState.copyWithNoError(
         isInitialized: true,
+        connections: connections,
+      ));
+    } catch (e, s) {
+      emit(saveState.copyWithError(UnknownError(
+        error: e,
+        stackTrace: s,
+      )));
+    }
+  }
+
+  Future<void> fetchConnections() async {
+    final saveState = state;
+    try {
+      final connections = [
+        (
+          hostname: await SettingsRepo().host.value,
+          port: int.parse(await SettingsRepo().port.value),
+        ),
+      ]; //! To be replaced with actual connections
+      emit(saveState.copyWithNoError(
         connections: connections,
       ));
     } catch (e, s) {
@@ -138,12 +174,37 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
     int port,
   ) async {
     final saveState = state;
+    LoadingDialog.show(UiRepo.context);
     try {
+      log('Connecting to $ip:$port');
       await OscilloscopeRepo().connect(ip, port);
+      emit(saveState.copyWithNoError(
+        isConnected: true,
+      ));
+    } on ErrorBase catch (e, s) {
+      UiRepo.navigator.pop();
+      emit(saveState.copyWithError(e..stackTrace = s));
+      await OscilloscopeRepo().disconnect();
+      _videoSub?.cancel();
+      _videoSub = null;
+      return;
+    } catch (e, s) {
+      UiRepo.navigator.pop();
+      emit(saveState.copyWithError(UnknownError(
+        error: e,
+        stackTrace: s,
+      )));
+      await OscilloscopeRepo().disconnect();
+      _videoSub?.cancel();
+      _videoSub = null;
+      return;
+    }
+
+    try {
       final data = await OscilloscopeRepo().apiProvider.getAll();
+      UiRepo.navigator.pop();
       emit(saveState.copyWithData(
         isInitialized: true,
-        isConnected: true,
         data: data,
       ));
       _videoSub = OscilloscopeRepo().videoStream.listen(
@@ -152,32 +213,62 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
             _videoSub?.cancel();
             return;
           }
-          emit(saveState.copyWithData(
-            data: saveState.data!.copyWith(
+          emit(state.copyWithData(
+            data: state.data!.copyWith(
               videoFrames: [
-                ...saveState.data!.videoFrames,
+                ...state.data!.videoFrames,
                 event,
               ],
             ),
           ));
         },
       );
+    } on ErrorBase catch (e, s) {
+      UiRepo.navigator.pop();
+      emit(saveState.copyWithError(e..stackTrace = s));
+      await OscilloscopeRepo().disconnect();
+      _videoSub?.cancel();
+      _videoSub = null;
     } catch (e, s) {
-      emit(saveState.copyWithError(RequestError(
+      UiRepo.navigator.pop();
+      emit(saveState.copyWithError(UnknownError(
         error: e,
         stackTrace: s,
       )));
+      await OscilloscopeRepo().disconnect();
       _videoSub?.cancel();
+      _videoSub = null;
     }
   }
 
   Future<void> disconnect() async {
     final saveState = state;
+    LoadingDialog.show(UiRepo.context);
     try {
       await OscilloscopeRepo().disconnect();
-      emit(saveState.copyWith(
+      UiRepo.navigator.pop();
+      emit(saveState.copyWithNoError(
         isConnected: false,
       ));
+      _videoSub?.cancel();
+      _videoSub = null;
+    } catch (e, s) {
+      UiRepo.navigator.pop();
+      emit(saveState.copyWithError(
+        RequestError(
+          error: e,
+          stackTrace: s,
+        ),
+      ));
+    }
+  }
+
+  Future<void> reset() async {
+    final saveState = state;
+    try {
+      await disconnect();
+      emit(defaultState);
+      await init();
     } catch (e, s) {
       emit(saveState.copyWithError(
         RequestError(
@@ -186,8 +277,6 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
         ),
       ));
     }
-    _videoSub?.cancel();
-    _videoSub = null;
   }
 
   Future<void> capture({String? fileName}) async {
