@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -258,7 +256,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(
@@ -286,7 +283,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(
@@ -315,7 +311,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(
@@ -341,7 +336,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(
@@ -364,7 +358,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(
@@ -387,7 +380,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(
@@ -410,7 +402,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         ),
       );
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
       state = prevState.copyWith(
         hasError: true,
         error: UnknownError(

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
+import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_video_command.dart';
 
 import 'channel_data.dart';
 import 'trigger_data.dart';
@@ -10,6 +11,7 @@ class OscilloscopeData extends Equatable {
   final String ip;
   final int port;
   final List<({DateTime timestamp, Uint8List image})> videoFrames;
+  final OscilloscopeVideoCommandType videoCommandType;
   final List<ChannelData> channels;
   final double timePerDiv;
   final TriggerData trigger;
@@ -19,6 +21,7 @@ class OscilloscopeData extends Equatable {
     required this.ip,
     required this.port,
     this.videoFrames = const <({DateTime timestamp, Uint8List image})>[],
+    this.videoCommandType = OscilloscopeVideoCommandType.stop,
     required this.channels,
     required this.timePerDiv,
     required this.trigger,
@@ -29,6 +32,7 @@ class OscilloscopeData extends Equatable {
     String? ip,
     int? port,
     List<({DateTime timestamp, Uint8List image})>? videoFrames,
+    OscilloscopeVideoCommandType? videoCommandType,
     List<ChannelData>? channels,
     double? timePerDiv,
     TriggerData? trigger,
@@ -38,6 +42,7 @@ class OscilloscopeData extends Equatable {
       ip: ip ?? this.ip,
       port: port ?? this.port,
       videoFrames: videoFrames ?? this.videoFrames,
+      videoCommandType: videoCommandType ?? this.videoCommandType,
       channels: channels ?? this.channels,
       timePerDiv: timePerDiv ?? this.timePerDiv,
       trigger: trigger ?? this.trigger,

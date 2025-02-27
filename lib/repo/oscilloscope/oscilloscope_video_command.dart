@@ -19,4 +19,6 @@ enum OscilloscopeVideoCommandType {
         return 'stop';
     }
   }
+
+  bool get isPaused => this == OscilloscopeVideoCommandType.pause;
 }

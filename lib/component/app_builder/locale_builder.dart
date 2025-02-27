@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oscillo_ui/constant/theme.dart';
 import 'package:oscillo_ui/page/settings_page/settings_cubit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/l10n/generated/app_localizations.dart';
 
 class LocaleBuilder extends StatefulWidget {
   final Widget Function(

@@ -1,12 +1,10 @@
 import 'dart:math';
-import 'dart:developer' as dev;
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/constant/theme.dart';
-import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 import 'package:sizer/sizer.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/l10n/generated/app_localizations.dart';
 
 class ErrorBuilder extends StatelessWidget {
   final FlutterErrorDetails details;

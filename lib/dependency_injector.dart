@@ -9,7 +9,7 @@ import 'package:oscillo_ui/repo/database/database_repo.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
 
 class DependencyInjector {
-  Future<void> init() async {
+  static Future<void> init() async {
     WidgetsFlutterBinding.ensureInitialized();
     ErrorWidget.builder = (details) {
       return ErrorBuilder(details);

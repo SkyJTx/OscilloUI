@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/l10n/generated/app_localizations.dart';
 import 'package:oscillo_ui/component/value_change_notifier/value_change_notifier.dart';
 import 'package:oscillo_ui/page/gallery_page/gallery_page.dart';
 import 'package:oscillo_ui/page/main_page/main_page.dart';
@@ -26,17 +26,22 @@ class HomeState extends State<Home> {
         return NavigationView(
           appBar: NavigationAppBar(
             title: Text(locale.title),
-            actions: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Button(
-                  child: Icon(FluentIcons.reset),
-                  onPressed: () {
-                    context.read<OscilloscopeCubit>().reset();
-                  },
+            actions: Center(
+              child: Padding(
+                padding: EdgeInsets.only(right: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Button(
+                      child: Icon(FluentIcons.reset),
+                      onPressed: () {
+                        context.read<OscilloscopeCubit>().reset();
+                      },
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           pane: NavigationPane(

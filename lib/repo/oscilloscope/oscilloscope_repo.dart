@@ -13,7 +13,6 @@ import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_video_command.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
 
 class OscilloscopeRepo {
-
   static final OscilloscopeRepo _instance = OscilloscopeRepo._internal();
 
   factory OscilloscopeRepo() => _instance;
@@ -159,7 +158,7 @@ class OscilloscopeRepo {
 
   static Future<void> _videoIsolateEntryPoint(SendPort port) async {
     late final OscilloscopeApiProvider apiProvider;
-    final frameTime = (1/60).milliseconds;
+    final frameTime = (1 / 1).milliseconds;
     bool isCapturing = false;
     bool isStopped = false;
     Completer<void> initCompleter = Completer();
@@ -204,12 +203,13 @@ class OscilloscopeRepo {
       if (isCapturing) {
         log('Capturing image');
         final data = await apiProvider.capture();
+        log('Image captured in ${DateTime.now().difference(startTime).inMilliseconds} ms');
         port.send({
           'timestamp': DateTime.now().toIso8601String(),
           'image': String.fromCharCodes(data),
         });
       }
-      final waitTime = frameTime - DateTime.now().difference(startTime);
+      final waitTime = DateTime.now().difference(startTime) - frameTime;
       await Future.delayed(waitTime > Duration.zero ? waitTime : Duration.zero);
     }
 
@@ -220,10 +220,6 @@ class OscilloscopeRepo {
 
   Future<void> sendVideoCommand(OscilloscopeVideoCommandType command) async {
     sendPort.send(command.command);
-    final msg = await receivePort.first as OscilloscopeVideoCommandType;
-    if (msg.command != command.command) {
-      throw Exception('Invalid response');
-    }
   }
 
   Future<void> disconnect() async {
@@ -247,7 +243,7 @@ class OscilloscopeRepo {
   Future<void> capture({String? fileName}) async {
     final data = await apiProvider.capture();
     final name = fileName ?? 'capture_${DateTime.now().millisecondsSinceEpoch}';
-    
+
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       final savePath = await SettingsRepo().imageSavePath.value;
       final path = '$savePath/$name.png';

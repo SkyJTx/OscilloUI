@@ -101,7 +101,7 @@ class VideoRepo {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       try {
         final videoSavePath = await SettingsRepo().videoSavePath.value;
-        final path = '$videoSavePath/$name.mp4';
+        final path = '$videoSavePath/$fileName.mp4';
         final file = File(tempVideoPath);
         await file.copy(path);
       } on ErrorBase {

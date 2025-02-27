@@ -186,6 +186,31 @@
     "description": "The save text",
     "type": "text"
   },
+  "captureText": "Capture {Type}",
+  "@captureText": {
+    "description": "A capture text",
+    "type": "text",
+    "placeholders": {
+      "Type": {
+        "type": "String"
+      }
+    }
+  },
+  "stopText": "Stop",
+  "@stopText": {
+    "description": "A stop text",
+    "type": "text"
+  },
+  "imageText": "Image",
+  "@imageText": {
+    "description": "An image text",
+    "type": "text"
+  },
+  "videoText": "Video",
+  "@videoText": {
+    "description": "A video text",
+    "type": "text"
+  },
   "errorText": "Error",
   "@errorText": {
     "description": "An error text",

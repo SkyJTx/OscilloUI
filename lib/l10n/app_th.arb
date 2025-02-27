@@ -186,6 +186,31 @@
     "description": "ข้อความบันทึกข้อมูล",
     "type": "text"
   },
+  "captureText": "จับ{Type}",
+  "@captureText": {
+    "description": "ข้อความสำหรับการจับภาพ",
+    "type": "text",
+    "placeholders": {
+      "Type": {
+        "type": "String"
+      }
+    }
+  },
+  "stopText": "หยุด",
+  "@stopText": {
+    "description": "ข้อความสำหรับการหยุด",
+    "type": "text"
+  },
+  "imageText": "รูปภาพ",
+  "@imageText": {
+    "description": "ข้อความสำหรับรูปภาพ",
+    "type": "text"
+  },
+  "videoText": "วิดีโอ",
+  "@videoText": {
+    "description": "ข้อความสำหรับวิดีโอ",
+    "type": "text"
+  },
   "errorText": "ข้อผิดพลาด",
   "@errorText": {
     "description": "ข้อความข้อผิดพลาด",
@@ -266,7 +291,7 @@
     "description": "ข้อความสำหรับข้อผิดพลาดการเข้าถึงถูกปฏิเสธ",
     "type": "text"
   },
-  "fatalErrorText": "โปรแกรมพบปัญหาและจำเป็นต้องปิด เราขออภัยในความไม่สะดวก กรุณารายงานข้อผิดพลาดนี้ให้กับนักพัฒนา ขอบคุณ!",
+  "fatalErrorText": "โปรแกรมพบปัญหาและจำเป็นต้องปิด เราขออภัยในความไม่สะดวก กรุณารายงานข้อผิดพลาดนี้ให้กับนักพัฒนา ขอบคุณ",
   "@fatalErrorText": {
     "description": "ข้อความสำหรับข้อผิดพลาดร้ายแรง",
     "type": "text"

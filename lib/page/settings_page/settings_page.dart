@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/l10n/generated/app_localizations.dart';
 import 'package:oscillo_ui/component/app_builder/locale_builder.dart';
 import 'package:oscillo_ui/component/dialogs/error_dialog.dart';
 import 'package:oscillo_ui/component/dialogs/loading_dialog.dart';
@@ -447,11 +447,11 @@ class SettingsPageState extends State<SettingsPage> {
                                           systemLocaleData?.defaultText ??
                                               AppLocalizations.of(context).defaultText,
                                         ),
-                                        if (systemLocaleData != null)
-                                          Text(
-                                            systemLocaleData.language,
-                                            style: theme.typography.caption,
-                                          ),
+                                        Text(
+                                          systemLocaleData?.language ??
+                                              AppLocalizations.of(context).language,
+                                          style: theme.typography.caption,
+                                        ),
                                       ],
                               ),
                             ),
@@ -550,13 +550,20 @@ class SettingsPageState extends State<SettingsPage> {
                       ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: 150),
                         child: FilledButton(
-                          child: Text("Show Loading"),
+                          child: Text("Show Fatal Error"),
+                          onPressed: () {},
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 150),
+                        child: FilledButton(
+                          child: Text("Show Synchronous Task Loading"),
                           onPressed: () async {
                             try {
                               final result = await LoadingDialog.callIsolate(
                                 context,
                                 (value, setValue) async {
-                                  final loop = 100000000;
+                                  final loop = 1_000_000_000;
                                   for (var i = 0; i < loop; i++) {
                                     if (i % (loop / 100) == 0) {
                                       setValue(i / (loop / 100));

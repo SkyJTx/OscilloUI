@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:oscillo_ui/objectbox.g.dart';
 import 'package:oscillo_ui/repo/database/database_repo.dart';
 import 'package:oscillo_ui/repo/database/entities/connection_set_entity.dart';
@@ -30,20 +32,59 @@ class ConnectionsRepo {
     );
   }
 
-  Future<List<ConnectionSetEntity>> add(ConnectionSetEntity connection) async {
+  Future<List<ConnectionSetEntity>> add(
+    ConnectionSetEntity connection,
+  ) async {
     final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, params) {
+      (store, p) {
+        final params = (
+          connections: p[0] as List<ConnectionSetEntity>,
+          connection: p[1] as ConnectionSetEntity,
+        );
         final box = store.box<ConnectionSetEntity>();
         box.put(params.connection);
         params.connections.add(params.connection);
 
         return params.connections;
       },
-      (
-        connections: _connections,
-        connection: connection,
-      ),
+      [
+        _connections,
+        connection,
+      ],
+    );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
+  }
+
+  Future<List<ConnectionSetEntity>> updateWithObject(
+    ConnectionSetEntity connection,
+  ) async {
+    final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
+      TxMode.write,
+      (store, p) {
+        final params = (
+          connections: p[0] as List<ConnectionSetEntity>,
+          connection: p[1] as ConnectionSetEntity,
+        );
+        final box = store.box<ConnectionSetEntity>();
+        final index = params.connections.indexWhere(
+          (element) => element.id == params.connection.id,
+        );
+        if (index != -1) {
+          box.put(params.connection);
+          params.connections[index] = params.connection;
+        }
+
+        return params.connections;
+      },
+      [
+        _connections,
+        connection,
+      ],
     );
 
     _connections.clear();
@@ -60,7 +101,11 @@ class ConnectionsRepo {
   }) async {
     final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, params) {
+      (store, p) {
+        final params = (
+          connections: p[0] as List<ConnectionSetEntity>,
+          connection: p[1] as ConnectionSetEntity,
+        );
         final box = store.box<ConnectionSetEntity>();
         final index = params.connections.indexWhere(
           (element) => element.id == params.connection.id,
@@ -75,10 +120,10 @@ class ConnectionsRepo {
 
         return params.connections;
       },
-      (
-        connections: _connections,
-        connection: connection,
-      ),
+      [
+        _connections,
+        connection,
+      ],
     );
 
     _connections.clear();
@@ -90,7 +135,11 @@ class ConnectionsRepo {
   Future<List<ConnectionSetEntity>> remove(ConnectionSetEntity connection) async {
     final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, params) {
+      (store, p) {
+        final params = (
+          connections: p[0] as List<ConnectionSetEntity>,
+          connection: p[1] as ConnectionSetEntity,
+        );
         final box = store.box<ConnectionSetEntity>();
         final index =
             params.connections.indexWhere((element) => element.id == params.connection.id);
@@ -101,10 +150,124 @@ class ConnectionsRepo {
 
         return params.connections;
       },
-      (
-        connections: _connections,
-        connection: connection,
-      ),
+      [
+        _connections,
+        connection,
+      ],
+    );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
+  }
+
+  Future<List<ConnectionSetEntity>> removeBy({
+    int? id,
+    int? index,
+    String? name,
+    String? host,
+    int? port,
+    bool batchRemove = false,
+  }) async {
+    assert(
+      id != null || index != null || name != null || host != null || port != null,
+      'At least one of the parameters must be provided',
+    );
+
+    final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
+      TxMode.write,
+      (store, p) {
+        final params = (
+          connections: p[0] as List<ConnectionSetEntity>,
+          id: p[1] as int?,
+          index: p[2] as int?,
+          name: p[3] as String?,
+          host: p[4] as String?,
+          port: p[5] as int?,
+          batchRemove: p[6] as bool,
+        );
+        final box = store.box<ConnectionSetEntity>();
+        final connections = params.connections;
+        final toRemove = <ConnectionSetEntity>[];
+
+        if (params.id != null) {
+          final entity = box.get(params.id!);
+          if (entity != null) {
+            toRemove.add(entity);
+          }
+        } else if (params.index != null) {
+          if (params.index! >= 0 && params.index! < connections.length) {
+            toRemove.add(connections[params.index!]);
+          }
+        } else {
+          toRemove.addAll(connections.where((element) {
+            return (params.name != null && element.name == params.name) ||
+                (params.host != null && element.host == params.host) ||
+                (params.port != null && element.port == params.port);
+          }));
+        }
+
+        for (final entity in toRemove) {
+          box.remove(entity.id);
+          connections.remove(entity);
+        }
+
+        return connections;
+      },
+      [
+        _connections,
+        id,
+        index,
+        name,
+        host,
+        port,
+        batchRemove,
+      ]
+    );
+
+    _connections.clear();
+    _connections.addAll(newConnections);
+
+    return _connections;
+  }
+
+  Future<List<ConnectionSetEntity>> removeByCondition({
+    required FutureOr<bool> Function(
+      ConnectionSetEntity entity,
+    ) condition,
+    bool batchRemove = false,
+  }) async {
+    final newConnections = await await storeRepo.storeInstance.runInTransactionAsync(
+      TxMode.write,
+      (store, p) async {
+        final params = (
+          connections: p[0] as List<ConnectionSetEntity>,
+          condition: p[1] as FutureOr<bool> Function(ConnectionSetEntity entity),
+          batchRemove: p[2] as bool,
+        );
+        final box = store.box<ConnectionSetEntity>();
+        final connections = params.connections;
+        final toRemove = <ConnectionSetEntity>[];
+
+        for (final entity in connections) {
+          if (await params.condition(entity)) {
+            toRemove.add(entity);
+          }
+        }
+
+        for (final entity in toRemove) {
+          box.remove(entity.id);
+          connections.remove(entity);
+        }
+
+        return connections;
+      },
+      [
+        _connections,
+        condition,
+        batchRemove,
+      ],
     );
 
     _connections.clear();
@@ -116,14 +279,14 @@ class ConnectionsRepo {
   Future<List<ConnectionSetEntity>> clear() async {
     final newConnections = await storeRepo.storeInstance.runInTransactionAsync(
       TxMode.write,
-      (store, params) {
+      (store, connections) {
         final box = store.box<ConnectionSetEntity>();
         box.removeAll();
-        params.connections.clear();
+        connections.clear();
 
-        return params.connections;
+        return connections;
       },
-      (connections: _connections),
+      _connections,
     );
 
     _connections.clear();

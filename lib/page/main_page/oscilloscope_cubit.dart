@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +7,7 @@ import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/constant/oscilloscope.dart';
 import 'package:oscillo_ui/data_models/oscilloscope_data/oscilloscope_data.dart';
 import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_repo.dart';
+import 'package:oscillo_ui/repo/oscilloscope/oscilloscope_video_command.dart';
 import 'package:oscillo_ui/repo/settings/settings_repo.dart';
 import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 
@@ -47,7 +47,7 @@ class OscilloscopeState extends Equatable {
       hasError: hasError ?? this.hasError,
       error: error ?? this.error,
       connections: connections ?? this.connections,
-      data: data ?? this.data,
+      data: data,
     );
   }
 
@@ -131,13 +131,14 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
   Future<void> init() async {
     final saveState = state;
     try {
+      emit(defaultState);
       final connections = [
         (
           hostname: await SettingsRepo().host.value,
           port: int.parse(await SettingsRepo().port.value),
         ),
       ]; //! To be replaced with actual connections
-      emit(saveState.copyWithNoError(
+      emit(state.copyWithNoError(
         isInitialized: true,
         connections: connections,
       ));
@@ -158,7 +159,7 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
           port: int.parse(await SettingsRepo().port.value),
         ),
       ]; //! To be replaced with actual connections
-      emit(saveState.copyWithNoError(
+      emit(state.copyWithNoError(
         connections: connections,
       ));
     } catch (e, s) {
@@ -173,12 +174,11 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
     String ip,
     int port,
   ) async {
-    final saveState = state;
+    OscilloscopeState saveState = state;
     LoadingDialog.show(UiRepo.context);
     try {
-      log('Connecting to $ip:$port');
       await OscilloscopeRepo().connect(ip, port);
-      emit(saveState.copyWithNoError(
+      emit(state.copyWithNoError(
         isConnected: true,
       ));
     } on ErrorBase catch (e, s) {
@@ -200,12 +200,14 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
       return;
     }
 
+    saveState = state;
     try {
       final data = await OscilloscopeRepo().apiProvider.getAll();
       UiRepo.navigator.pop();
-      emit(saveState.copyWithData(
-        isInitialized: true,
-        data: data,
+      emit(state.copyWithData(
+        data: data.copyWith(
+          videoCommandType: OscilloscopeVideoCommandType.resume,
+        ),
       ));
       _videoSub = OscilloscopeRepo().videoStream.listen(
         (event) {
@@ -247,8 +249,11 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
     try {
       await OscilloscopeRepo().disconnect();
       UiRepo.navigator.pop();
-      emit(saveState.copyWithNoError(
+      emit(state.copyWithNoError(
         isConnected: false,
+        data: state.data?.copyWith(
+          videoCommandType: OscilloscopeVideoCommandType.stop,
+        ),
       ));
       _videoSub?.cancel();
       _videoSub = null;
@@ -256,6 +261,48 @@ class OscilloscopeCubit extends Cubit<OscilloscopeState> {
       UiRepo.navigator.pop();
       emit(saveState.copyWithError(
         RequestError(
+          error: e,
+          stackTrace: s,
+        ),
+      ));
+    }
+  }
+
+  Future<void> play() async {
+    final saveState = state;
+    try {
+      await OscilloscopeRepo().sendVideoCommand(OscilloscopeVideoCommandType.resume);
+      emit(state.copyWithNoError(
+        data: state.data?.copyWith(
+          videoCommandType: OscilloscopeVideoCommandType.resume,
+        ),
+      ));
+    } on UnsupportedPlatformError catch (e) {
+      emit(saveState.copyWithError(e));
+    } catch (e, s) {
+      emit(saveState.copyWithError(
+        UnknownError(
+          error: e,
+          stackTrace: s,
+        ),
+      ));
+    }
+  }
+
+  Future<void> pause() async {
+    final saveState = state;
+    try {
+      await OscilloscopeRepo().sendVideoCommand(OscilloscopeVideoCommandType.pause);
+      emit(state.copyWithNoError(
+        data: state.data?.copyWith(
+          videoCommandType: OscilloscopeVideoCommandType.pause,
+        ),
+      ));
+    } on UnsupportedPlatformError catch (e) {
+      emit(saveState.copyWithError(e));
+    } catch (e, s) {
+      emit(saveState.copyWithError(
+        UnknownError(
           error: e,
           stackTrace: s,
         ),

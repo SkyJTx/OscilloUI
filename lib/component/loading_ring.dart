@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/l10n/generated/app_localizations.dart';
 
 class LoadingRing extends StatelessWidget {
   final double? size;
@@ -32,8 +32,7 @@ class LoadingRing extends StatelessWidget {
           builder: (context) {
             late String finalProgressString;
             if (value != null) {
-              finalProgressString =
-                  '${(value! + 1).clamp(0, 100).toDouble().toStringAsFixed(0)}% ';
+              finalProgressString = '${(value! + 1).clamp(0, 100).toDouble().toStringAsFixed(0)}% ';
             } else {
               finalProgressString = '';
             }

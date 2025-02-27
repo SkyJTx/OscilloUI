@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/component/task.dart';
 import 'package:oscillo_ui/constant/oscilloscope.dart';
@@ -11,7 +12,7 @@ import 'package:oscillo_ui/data_models/oscilloscope_data/trigger_data.dart';
 
 class OscilloscopeApiProvider {
   Socket? _socket;
-  Stream? _broadcastStream;
+  Stream<Uint8List>? _broadcastStream;
   Completer<bool> _connectedCompleter = Completer<bool>();
   final String ip;
   final int port;
@@ -59,12 +60,8 @@ class OscilloscopeApiProvider {
     return _socket!;
   }
 
-  Stream get broadcastStream {
-    _broadcastStream ??= socket.asBroadcastStream(
-      onCancel: (subscription) {
-        _broadcastStream = null;
-      },
-    );
+  Stream<Uint8List> get broadcastStream {
+    if (_broadcastStream == null) throw Exception('Broadcast stream is null');
     return _broadcastStream!;
   }
 
@@ -72,15 +69,18 @@ class OscilloscopeApiProvider {
     Duration timeout = const Duration(seconds: 15),
   }) async {
     if (isConnected) return;
-    
+
     _socket = await Socket.connect(ip, port, timeout: timeout);
+    _broadcastStream = _socket!.asBroadcastStream();
+    debugPrint('create broadcastStream from connect ${broadcastStream.toString()}');
 
     _connectedCompleter.complete(true);
   }
 
   Future<void> disconnect() async {
     if (!isConnected) return;
-      await _socket!.close();
+    _broadcastStream = null;
+    await _socket!.close();
     _socket = null;
 
     _connectedCompleter = Completer<bool>();
@@ -220,7 +220,6 @@ class OscilloscopeApiProvider {
     String command, {
     bool isWriteMode = true,
     bool removeNewLine = true,
-    Duration interWaitingTime = const Duration(milliseconds: 200),
     Duration timeout = const Duration(seconds: 5),
   }) async {
     final completer = Completer<Uint8List>();
@@ -232,31 +231,72 @@ class OscilloscopeApiProvider {
     socket.writeln(command);
 
     BytesBuilder respData = BytesBuilder();
-    Timer? timer;
+
     final sub = broadcastStream.listen((data) {
+      final strData = String.fromCharCodes(data);
       respData.add(data);
-      timer?.cancel();
-      timer = Timer(interWaitingTime, () {
+      if (strData.endsWith('\n')) {
         if (removeNewLine) {
-          final respBytes = respData.toBytes();
-          final stringBytes = String.fromCharCodes(respBytes);
-          final newLineFilteredStringBytes = stringBytes.replaceAll('\n', '');
-          final stringBytesCodeUnits = newLineFilteredStringBytes.codeUnits;
-          final data = Uint8List.fromList(stringBytesCodeUnits);
-          completer.complete(data);
+          final respByteList = respData.toBytes().toList();
+          final noLastByte = respByteList.sublist(0, respByteList.length - 1);
+
+          completer.complete(Uint8List.fromList(noLastByte));
         } else {
           completer.complete(respData.toBytes());
         }
-      });
+      }
     });
 
     return await completer.future.whenComplete(() async {
-      timeoutTimer.cancel();
-      timer?.cancel();
       await sub.cancel();
+      timeoutTimer.cancel();
       if (isWriteMode) {
         await socket.flush();
       }
     });
   }
+
+  // Future<Uint8List> run(
+  //   String command, {
+  //   bool isWriteMode = true,
+  //   bool removeNewLine = true,
+  //   Duration interWaitingTime = const Duration(milliseconds: 200),
+  //   Duration timeout = const Duration(seconds: 5),
+  // }) async {
+  //   final completer = Completer<Uint8List>();
+  //   final timeoutTimer = Timer(timeout, () {
+  //     completer.completeError(TimeoutError());
+  //   });
+  //   if (!isConnected) throw RequestError(error: 'Not connected to oscilloscope');
+
+  //   socket.writeln(command);
+
+  //   BytesBuilder respData = BytesBuilder();
+  //   Timer? timer;
+  //   final sub = broadcastStream.listen((data) {
+  //     respData.add(data);
+  //     timer?.cancel();
+  //     timer = Timer(interWaitingTime, () {
+  //       if (removeNewLine) {
+  //         final respBytes = respData.toBytes();
+  //         final stringBytes = String.fromCharCodes(respBytes);
+  //         final newLineFilteredStringBytes = stringBytes.replaceAll('\n', '');
+  //         final stringBytesCodeUnits = newLineFilteredStringBytes.codeUnits;
+  //         final data = Uint8List.fromList(stringBytesCodeUnits);
+  //         completer.complete(data);
+  //       } else {
+  //         completer.complete(respData.toBytes());
+  //       }
+  //     });
+  //   });
+
+  //   return await completer.future.whenComplete(() async {
+  //     timeoutTimer.cancel();
+  //     timer?.cancel();
+  //     await sub.cancel();
+  //     if (isWriteMode) {
+  //       await socket.flush();
+  //     }
+  //   });
+  // }
 }

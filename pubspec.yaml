@@ -25,16 +25,22 @@ dependencies:
   objectbox_flutter_libs: ^4.1.0
   path_provider: ^2.1.5
   sizer: ^3.0.5
-  image: ^4.5.2
-  opencv_dart: ^1.4.0
+  image: ^4.5.3
+  opencv_dart: ^1.4.1
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.14
+  build_runner: ^2.4.15
   objectbox_generator: ^4.1.0
 
 flutter:
   uses-material-design: true
   generate: true
+
+  assets:
+    - assets/
+    - assets/image/
+    - assets/image/icon/

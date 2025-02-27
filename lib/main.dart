@@ -1,10 +1,10 @@
-import 'dart:developer';
-
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:oscillo_ui/component/app_builder/locale_builder.dart';
 import 'package:oscillo_ui/component/app_builder/theme_builder.dart';
+import 'package:oscillo_ui/component/errors/error_cubit.dart';
+import 'package:oscillo_ui/component/errors/error_base.dart';
 import 'package:oscillo_ui/dependency_injector.dart';
 import 'package:oscillo_ui/page/home.dart';
 import 'package:oscillo_ui/page/main_page/oscilloscope_cubit.dart';
@@ -17,7 +17,7 @@ import 'package:oscillo_ui/repo/ui/ui_repo.dart';
 import 'package:sizer/sizer.dart';
 
 void main() async {
-  await DependencyInjector().init();
+  await DependencyInjector.init();
   runApp(MultiRepositoryProvider(
     providers: [
       RepositoryProvider.value(
@@ -41,15 +41,25 @@ void main() async {
         BlocProvider.value(
           value: OscilloscopeCubit()..init(),
         ),
+        BlocProvider.value(
+          value: ErrorCubit(),
+        ),
       ],
-      child: const MainApp(),
+      child: MainApp(),
     ),
   ));
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MainApp extends StatefulWidget {
+  const MainApp({
+    super.key,
+  });
 
+  @override
+  MainAppState createState() => MainAppState();
+}
+
+class MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return Sizer(
@@ -89,26 +99,30 @@ class MainApp extends StatelessWidget {
                   home: MultiBlocListener(
                     listeners: [
                       BlocListener<SettingsCubit, SettingsState>(
+                        listenWhen: (previous, current) {
+                          return current.hasError && current.error != null && previous.error != current.error;
+                        },
                         listener: (context, state) {
                           if (state.hasError) {
-                            state.error?.raise(context);
-                            log(
-                              "SettingsCubit error: ${state.error?.error}",
-                              error: state.error?.error,
-                              stackTrace: state.error?.stackTrace,
-                            );
+                            ErrorCubit().setError(state.error!);
                           }
                         },
                       ),
                       BlocListener<OscilloscopeCubit, OscilloscopeState>(
+                        listenWhen: (previous, current) {
+                          return current.hasError && current.error != null && previous.error != current.error;
+                        },
                         listener: (context, state) {
                           if (state.hasError) {
-                            state.error?.raise(context);
-                            log(
-                              "OscilloscopeCubit error: ${state.error?.error}",
-                              error: state.error?.error,
-                              stackTrace: state.error?.stackTrace,
-                            );
+                            ErrorCubit().setError(state.error!);
+                          }
+                        },
+                      ),
+                      BlocListener<ErrorCubit, ErrorBase?>(
+                        listener: (context, state) {
+                          if (state != null) {
+                            state.raise(context);
+                            ErrorCubit().clearError();
                           }
                         },
                       ),

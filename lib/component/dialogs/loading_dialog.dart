@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:oscillo_ui/component/value_change_notifier/value_change_notifier.dart';
 import 'package:oscillo_ui/repo/ui/ui_repo.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:oscillo_ui/l10n/generated/app_localizations.dart';
 
 class LoadingDialog extends StatelessWidget {
   final double? progress;
@@ -28,6 +29,8 @@ class LoadingDialog extends StatelessWidget {
     Future<ReturnedValue> Function(double progress, void Function(double progress)) callback, {
     bool showProgress = false,
   }) {
+    assert(false,
+        'This method shouldn\'t be used in the main isolate. It will block everything such as, UI updates, etc.');
     final progressController = ValueChangeNotifer(0.0);
     showDialog(
       context: context,
