@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oscillo_ui/component/errors/error_base.dart';
@@ -62,7 +60,9 @@ class ConnectionSetViewState extends Equatable {
     if (newConnection != null) {
       final index = newConnections.indexWhere((c) => c.id == newConnection.id);
       if (index == -1) {
-        //TODO: Implement ErrorBase
+        newConnections.add(newConnection);
+      } else {
+        newConnections[index] = newConnection;
       }
     }
 
@@ -72,6 +72,19 @@ class ConnectionSetViewState extends Equatable {
       error: error,
       connections: newConnections,
       selectedConnection: newConnection,
+    );
+  }
+
+  ConnectionSetViewState copyWithNoError({
+    bool? isInitialized,
+    List<ConnectionSetEntity>? connections,
+    ConnectionSetEntity? selectedConnection,
+  }) {
+    return ConnectionSetViewState(
+      isInitialized: isInitialized ?? this.isInitialized,
+      hasError: false,
+      connections: connections ?? this.connections,
+      selectedConnection: selectedConnection ?? this.selectedConnection,
     );
   }
 
@@ -100,22 +113,77 @@ class ConnectionSetViewState extends Equatable {
 class ConnectionSetViewCubit extends Cubit<ConnectionSetViewState> {
   final ConnectionsRepo _connectionsRepo = ConnectionsRepo();
 
-  ConnectionSetViewCubit()
+  static ConnectionSetViewCubit? _singleton;
+
+  ConnectionSetViewCubit._internal()
       : super(ConnectionSetViewState(
           isInitialized: false,
           connections: [],
           selectedConnection: null,
         ));
 
-  Future<void> init() async {}
+  factory ConnectionSetViewCubit() {
+    return _singleton ??= ConnectionSetViewCubit._internal();
+  }
 
-  Future<void> selectConnection(ConnectionSetEntity? connection) async {}
+  Future<void> _execute(Future<void> Function() action) async {
+    final saveState = state;
 
-  Future<void> addConnection(ConnectionSetEntity connection) async {}
+    try {
+      return action();
+    } on ErrorBase catch (e) {
+      emit(saveState.copyWithError(error: e));
+    } catch (e, s) {
+      emit(saveState.copyWithError(
+        error: UnknownError(error: e, stackTrace: s),
+      ));
+    }
+  }
 
-  Future<void> editConnection(ConnectionSetEntity connection) async {}
+  Future<void> init() async {
+    await _execute(() async {
+      final connections = await _connectionsRepo.fetch();
+      emit(state.copyWithNoError(
+        isInitialized: true,
+        connections: connections,
+      ));
+    });
+  }
 
-  Future<void> deleteConnection(ConnectionSetEntity connection) async {}
+  Future<void> selectConnection(ConnectionSetEntity? connection) async {
+    emit(state.copyWith(selectedConnection: connection));
+  }
 
-  Future<void> clearAllConnections() async {}
+  Future<void> addConnection(ConnectionSetEntity connection) async {
+    await _execute(() async {
+      final newConnections = await _connectionsRepo.add(connection);
+      emit(state.copyWithConnection(connections: newConnections));
+    });
+  }
+
+  Future<void> editConnection(ConnectionSetEntity connection) async {
+    await _execute(() async {
+      final newConnections = await _connectionsRepo.updateWithObject(connection);
+      emit(state.copyWithConnection(connections: newConnections));
+    });
+  }
+
+  Future<void> deleteConnection(ConnectionSetEntity connection) async {
+    await _execute(() async {
+      final newConnections = await _connectionsRepo.remove(connection);
+      emit(state.copyWithConnection(connections: newConnections));
+    });
+  }
+
+  Future<void> clearAllConnections() async {
+    await _execute(() async {
+      final newConnections = await _connectionsRepo.clear();
+      emit(state.replaceWith(
+        isInitialized: true,
+        hasError: false,
+        connections: newConnections,
+        selectedConnection: null,
+      ));
+    });
+  }
 }
